@@ -68,6 +68,21 @@ public class JwtService {
     }
 
     /**
+     * Получение данных из токена
+     *
+     * @param token токен
+     * @return данные
+     */
+    public UserEntity getClaims(String token) {
+        Claims claims = extractAllClaims(token);
+        UserEntity userEntity = new UserEntity();
+        userEntity.setUsername(claims.getSubject());
+        userEntity.setEmail(claims.get("email").toString());
+        userEntity.setRole(Role.valueOf(claims.get("role").toString()));
+        return userEntity;
+    }
+
+    /**
      * Извлечение данных из токена
      *
      * @param token           токен
@@ -123,21 +138,6 @@ public class JwtService {
     private Claims extractAllClaims(String token) {
         return Jwts.parser().setSigningKey(getSigningKey()).build().parseClaimsJws(token)
                 .getBody();
-    }
-
-    /**
-     * Получение данных из токена
-     *
-     * @param token токен
-     * @return данные
-     */
-    public UserEntity getClaims(String token) {
-        Claims claims = extractAllClaims(token);
-        UserEntity userEntity = new UserEntity();
-        userEntity.setUsername(claims.getSubject());
-        userEntity.setEmail(claims.get("email").toString());
-        userEntity.setRole(Role.valueOf(claims.get("role").toString()));
-        return userEntity;
     }
 
     /**

@@ -42,4 +42,6 @@ public class AuthenticationController {
         return authenticationService.getTokenInfo(rq);
     }
 
+    //TODO: Добавить работу с ошибками и исключениями
+
 }

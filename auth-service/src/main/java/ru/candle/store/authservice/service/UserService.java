@@ -19,7 +19,7 @@ public class UserService {
      *
      * @return сохраненный пользователь
      */
-    public UserEntity save(UserEntity user) {
+    private UserEntity save(UserEntity user) {
         return repository.save(user);
     }
 
@@ -44,7 +44,7 @@ public class UserService {
      *
      * @return пользователь
      */
-    public UserEntity getByUsername(String username) {
+    private UserEntity getByUsername(String username) {
         return repository.findByUsername(username)
                 .orElseThrow(() -> new UsernameNotFoundException("Пользователь не найден"));
     }
