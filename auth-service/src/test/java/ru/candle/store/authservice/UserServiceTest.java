@@ -70,4 +70,18 @@ public class UserServiceTest {
         Mockito.verify(repository, Mockito.times(0)).save(user);
     }
 
+    @Test
+    void changeUserPasswordSuccess() {
+        Mockito.when(repository.updatePasswordByUsername(Mockito.any(), Mockito.any())).thenReturn(1);
+
+        Assertions.assertTrue(service.changePassword("pass", "login"));
+    }
+
+    @Test
+    void changeUserPasswordFail() {
+        Mockito.when(repository.updatePasswordByUsername(Mockito.any(), Mockito.any())).thenReturn(0);
+
+        Assertions.assertThrows(RuntimeException.class, () -> service.changePassword("pass", "login"), "Ошибка при обновлении пароля пользователя");
+    }
+
 }

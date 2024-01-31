@@ -14,6 +14,7 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import ru.candle.store.authservice.config.JwtAuthenticationFilter;
 import ru.candle.store.authservice.controller.AuthenticationController;
 import ru.candle.store.authservice.dto.request.GetTokenInfoRequest;
+import ru.candle.store.authservice.dto.response.ChangePasswordResponse;
 import ru.candle.store.authservice.dto.response.GetTokenInfoResponse;
 import ru.candle.store.authservice.dto.response.JwtAuthenticationResponse;
 import ru.candle.store.authservice.dto.response.ValidateResponse;
@@ -102,6 +103,23 @@ public class AuthenticationControllerTest {
         String requset = "{\"token\": \"\"}";
         Mockito.when(authenticationService.getTokenInfo(Mockito.any())).thenThrow(RuntimeException.class);
         mockMvc.perform(MockMvcRequestBuilders.post("/auth/token/info/get").content(requset).contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().is4xxClientError());
+    }
+
+    @Test
+    void WhenChangePasswordSuccess() throws Exception {
+        String requset = "{\"username\": \"userlogin\", \"currentPassword\": \"password1\", \"newPassword\": \"password2\"}";
+        Mockito.when(authenticationService.changePassword(Mockito.any())).thenReturn(new ChangePasswordResponse(true));
+        mockMvc.perform(MockMvcRequestBuilders.post("/auth/password/change").content(requset).contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(content().json("{\"success\": true}"));
+    }
+
+    @Test
+    void WhenChangePasswordFail() throws Exception {
+        String requset = "{\"username\": \"user\", \"currentPassword\": \"pass1\"}";
+        Mockito.when(authenticationService.getTokenInfo(Mockito.any())).thenThrow(RuntimeException.class);
+        mockMvc.perform(MockMvcRequestBuilders.post("/auth/password/change").content(requset).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().is4xxClientError());
     }
 }

@@ -7,12 +7,10 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import ru.candle.store.authservice.dictionary.Role;
-import ru.candle.store.authservice.dto.request.GetTokenInfoRequest;
-import ru.candle.store.authservice.dto.request.ValidateRequest;
+import ru.candle.store.authservice.dto.request.*;
+import ru.candle.store.authservice.dto.response.ChangePasswordResponse;
 import ru.candle.store.authservice.dto.response.GetTokenInfoResponse;
 import ru.candle.store.authservice.dto.response.JwtAuthenticationResponse;
-import ru.candle.store.authservice.dto.request.SignInRequest;
-import ru.candle.store.authservice.dto.request.SignUpRequest;
 import ru.candle.store.authservice.dto.response.ValidateResponse;
 import ru.candle.store.authservice.entity.UserEntity;
 
@@ -92,5 +90,21 @@ public class AuthenticationService {
                 userEntity.getEmail(),
                 userEntity.getRole().name()
         );
+    }
+
+    /**
+     * Изменение пароля пользователя
+     *
+     * @param request логин, текущий пароль, новый пароль
+     * @return результат смены пароля
+     */
+    public ChangePasswordResponse changePassword(ChangePasswordRequest request) {
+        authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(
+                request.getUsername(),
+                request.getCurrentPassword()
+        ));
+
+        boolean result = userService.changePassword(passwordEncoder.encode(request.getNewPassword()), request.getUsername());
+        return new ChangePasswordResponse(result);
     }
 }
