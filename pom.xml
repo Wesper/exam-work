@@ -20,6 +20,7 @@
         <module>eureka-server</module>
         <module>gateway-server</module>
         <module>auth-service</module>
+        <module>product-mplace-service</module>
     </modules>
 
 </project>
