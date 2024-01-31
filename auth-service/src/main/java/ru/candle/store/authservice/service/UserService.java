@@ -5,6 +5,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.candle.store.authservice.entity.UserEntity;
 import ru.candle.store.authservice.repository.UserRepository;
 
@@ -66,6 +67,20 @@ public class UserService {
     public UserEntity getCurrentUser() {
         var username = SecurityContextHolder.getContext().getAuthentication().getName();
         return getByUsername(username);
+    }
+
+    /**
+     * Изменение пароля пользователя
+     *
+     * @return сохраненный пользователь
+     */
+    @Transactional
+    public boolean changePassword(String password, String username) {
+        int updateRows = repository.updatePasswordByUsername(password, username);
+        if (updateRows != 1) {
+            throw new RuntimeException("Ошибка при обновлении пароля пользователя");
+        }
+        return true;
     }
 
 }
