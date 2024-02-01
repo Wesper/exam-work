@@ -18,7 +18,7 @@ public class ProductReviewEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "userId")
+    @Column(name = "user_id")
     @NonNull
     private Long userId;
 
