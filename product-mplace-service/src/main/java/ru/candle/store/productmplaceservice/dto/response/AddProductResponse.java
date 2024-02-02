@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class AddOrUpdateProductResponse {
+public class AddProductResponse {
 
     private boolean success;
 }

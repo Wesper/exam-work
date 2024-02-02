@@ -19,8 +19,10 @@ public class GetProductCardResponse {
     private String description;
     private Long price;
     private String measure;
+    private String unitMeasure;
     private String type;
-    private Long rating;
+    private Double rating;
     private Boolean actual;
+    private Boolean appreciated;
     private List<Review> review;
 }

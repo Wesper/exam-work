@@ -17,5 +17,5 @@ public class Product {
     private String subtitle;
     private Long price;
     private String type;
-    private Long rating;
+    private Double rating;
 }

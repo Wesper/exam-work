@@ -18,15 +18,22 @@ public class ProductRatingEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "sum")
+    @Column(name = "rating")
     @NonNull
-    private Long sum;
+    private Long rating;
 
     @Column(name = "product_id")
     @NonNull
     private Long productId;
 
-    @Column(name = "count")
+    @Column(name = "user_id")
     @NonNull
-    private Long count;
+    private Long userId;
+
+    public ProductRatingEntity(@NonNull Long id, @NonNull Long rating, @NonNull Long productId, @NonNull Long userId) {
+        this.id = id;
+        this.rating = rating;
+        this.productId = productId;
+        this.userId = userId;
+    }
 }

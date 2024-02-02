@@ -3,10 +3,8 @@ package ru.candle.store.productmplaceservice.service.impl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import ru.candle.store.productmplaceservice.dto.request.AddProductRequest;
-import ru.candle.store.productmplaceservice.dto.request.ChangeProductAvailableRequest;
-import ru.candle.store.productmplaceservice.dto.request.GetProductCardRequest;
-import ru.candle.store.productmplaceservice.dto.request.UpdateProductRequest;
+import ru.candle.store.productmplaceservice.dto.IAvgRatingByProduct;
+import ru.candle.store.productmplaceservice.dto.request.*;
 import ru.candle.store.productmplaceservice.dto.response.*;
 import ru.candle.store.productmplaceservice.entity.ProductEntity;
 import ru.candle.store.productmplaceservice.entity.ProductRatingEntity;
@@ -14,6 +12,7 @@ import ru.candle.store.productmplaceservice.entity.ProductReviewEntity;
 import ru.candle.store.productmplaceservice.repository.ProductRatingRepository;
 import ru.candle.store.productmplaceservice.repository.ProductRepository;
 import ru.candle.store.productmplaceservice.repository.ProductReviewRepository;
+import ru.candle.store.productmplaceservice.service.IIntegrationService;
 import ru.candle.store.productmplaceservice.service.IProductService;
 import ru.candle.store.productmplaceservice.service.ITransactionalService;
 
@@ -34,23 +33,26 @@ public class ProductServiceImpl implements IProductService, ITransactionalServic
     @Autowired
     ProductReviewRepository reviewRepository;
 
+    @Autowired
+    IIntegrationService integrationService;
+
     @Override
     public GetAllProductsResponse getAllProducts() {
         return getAllProductsResponse();
     }
 
     @Override
-    public GetProductCardResponse getProductCard(GetProductCardRequest rq) {
-        return getProductCardResponse(rq);
+    public GetProductCardResponse getProductCard(GetProductCardRequest rq, Long userId) {
+        return getProductCardResponse(rq, userId);
     }
 
     @Override
-    public AddOrUpdateProductResponse addProduct(AddProductRequest rq) {
+    public AddProductResponse addProduct(AddProductRequest rq) {
         return addProductResponse(rq);
     }
 
     @Override
-    public AddOrUpdateProductResponse updateProduct(UpdateProductRequest rq) {
+    public UpdateProductResponse updateProduct(UpdateProductRequest rq) {
         return updateProductResponse(rq);
     }
 
@@ -59,66 +61,60 @@ public class ProductServiceImpl implements IProductService, ITransactionalServic
         return changeProductAvailableResponse(rq);
     }
 
+    @Override
+    public AddReviewResponse addReview(AddReviewRequest rq, Long userId) {
+        return addReviewResponse(rq, userId);
+    }
+
+    @Override
+    public AddRatingResponse addRating(AddRatingRequest rq, Long userId) {
+        return addRatingResponse(rq, userId);
+    }
+
     private GetAllProductsResponse getAllProductsResponse() {
         List<ProductEntity> products = productRepository.findAllByActual(true);
+        if (products == null) {
+            throw new RuntimeException("Не найдено ни одного продукта");
+        }
         List<Long> productIds = products.stream().map(ProductEntity::getId).collect(Collectors.toList());
-        List<ProductRatingEntity> ratings = ratingRepository.findAllIn(productIds);
+        List<IAvgRatingByProduct> ratings = ratingRepository.getAvgRatingInGroupByProduct(productIds);
         return buildAllProductsResponse(products, ratings);
     }
 
-    private GetAllProductsResponse buildAllProductsResponse(List<ProductEntity> productsEntity, List<ProductRatingEntity> ratingsEntity) {
-        if (productsEntity == null || productsEntity.isEmpty()) {
-            throw new RuntimeException("Не найдено ни одного продукта");
-        }
+    private GetAllProductsResponse buildAllProductsResponse(List<ProductEntity> productsEntity, List<IAvgRatingByProduct> ratingsEntity) {
         GetAllProductsResponse response = new GetAllProductsResponse();
         List<Product> products = new ArrayList<>();
-        boolean f;
-        long sum;
-        long count;
+        Double rating;
         for (ProductEntity productEntity : productsEntity) {
-            sum = 0;
-            count = 0;
-            if (ratingsEntity != null && !ratingsEntity.isEmpty()) {
-                for (ProductRatingEntity ratingEntity : ratingsEntity) {
-                    if (productEntity.getId().equals(ratingEntity.getProductId())) {
-                        sum = ratingEntity.getSum();
-                        count = ratingEntity.getCount();
-                        break;
-                    }
-                }
-            }
-            long rating;
-            if (sum == 0 || count == 0) {
-                rating = 0;
-            } else {
-                rating = sum / count;
-            }
-            products.add(Product.builder()
-                    .productId(productEntity.getId())
-                    .imageId(productEntity.getImageId())
-                    .title(productEntity.getTitle())
-                    .subtitle(productEntity.getSubtitle())
-                    .price(productEntity.getPrice())
-                    .type(productEntity.getType())
-                    .rating(rating)
-                    .build()
+            Product product = new Product(
+                    productEntity.getId(),
+                    productEntity.getImageId(),
+                    productEntity.getTitle(),
+                    productEntity.getSubtitle(),
+                    productEntity.getPrice(),
+                    productEntity.getType(),
+                    null
             );
+            rating = ratingsEntity.stream().filter(r -> r.getId().equals(productEntity.getId())).mapToDouble(IAvgRatingByProduct::getAverage).sum();
+            product.setRating(rating);
+            products.add(product);
         }
         response.setSuccess(true);
         response.setProducts(products);
         return response;
     }
 
-    private GetProductCardResponse getProductCardResponse(GetProductCardRequest rq) {
+    private GetProductCardResponse getProductCardResponse(GetProductCardRequest rq, Long userId) {
         ProductEntity product = productRepository.findById(rq.getProductId()).orElseThrow(() -> new RuntimeException("Продукт не найден"));
-        ProductRatingEntity rating = ratingRepository.findByProductId(product.getId());
         List<ProductReviewEntity> review = reviewRepository.findAllByProductId(product.getId());
-        return buildProductCardResponse(product, rating, review);
+        Double rating = ratingRepository.getAvgRatingByProduct(rq.getProductId());
+        Integer countAppreciated = ratingRepository.findByUserIdAndProductId(userId, rq.getProductId());
+        return buildProductCardResponse(product, rating, countAppreciated, review, userId);
     }
 
-    private GetProductCardResponse buildProductCardResponse(ProductEntity productEntity, ProductRatingEntity ratingEntity, List<ProductReviewEntity> reviewEntities) {
+    private GetProductCardResponse buildProductCardResponse(ProductEntity productEntity, Double avgRating, Integer countAppreciated, List<ProductReviewEntity> reviewEntities, Long userId) {
         List<Review> reviews = new ArrayList<>();
-        if (reviewEntities != null && !reviewEntities.isEmpty()) {
+        if (reviewEntities != null) {
             for (ProductReviewEntity review : reviewEntities) {
                 reviews.add(Review.builder()
                         .userId(review.getUserId())
@@ -127,7 +123,9 @@ public class ProductServiceImpl implements IProductService, ITransactionalServic
                 );
             }
         }
-        Long rating = ratingEntity == null || ratingEntity.getCount() == 0 || ratingEntity.getSum() == 0 ? 0 : ratingEntity.getSum()/ratingEntity.getCount();
+        avgRating = avgRating != null ? avgRating : 0;
+        boolean appreciated = countAppreciated == null || countAppreciated == 1;
+
         return GetProductCardResponse.builder()
                 .productId(productEntity.getId())
                 .imageId(productEntity.getImageId())
@@ -135,14 +133,16 @@ public class ProductServiceImpl implements IProductService, ITransactionalServic
                 .description(productEntity.getDescription())
                 .price(productEntity.getPrice())
                 .measure(productEntity.getMeasure())
+                .unitMeasure(productEntity.getUnitMeasure())
                 .type(productEntity.getType())
-                .rating(rating)
+                .rating(avgRating)
+                .appreciated(appreciated)
                 .actual(productEntity.getActual())
                 .review(reviews)
                 .build();
     }
 
-    private AddOrUpdateProductResponse addProductResponse(AddProductRequest rq) {
+    private AddProductResponse addProductResponse(AddProductRequest rq) {
         ProductEntity product = new ProductEntity(
                 rq.getImageId(),
                 rq.getTitle(),
@@ -155,10 +155,10 @@ public class ProductServiceImpl implements IProductService, ITransactionalServic
                 rq.getActual()
         );
         productRepository.save(product);
-        return new AddOrUpdateProductResponse(true);
+        return new AddProductResponse(true);
     }
 
-    private AddOrUpdateProductResponse updateProductResponse(UpdateProductRequest rq) {
+    private UpdateProductResponse updateProductResponse(UpdateProductRequest rq) {
         ProductEntity product = new ProductEntity(
                 rq.getId(),
                 rq.getImageId(),
@@ -172,15 +172,37 @@ public class ProductServiceImpl implements IProductService, ITransactionalServic
                 rq.getActual()
         );
         productRepository.save(product);
-        return new AddOrUpdateProductResponse(true);
+        return new UpdateProductResponse(true);
     }
 
     @Transactional
-    public ChangeProductAvailableResponse changeProductAvailableResponse(ChangeProductAvailableRequest rq) {
+    protected ChangeProductAvailableResponse changeProductAvailableResponse(ChangeProductAvailableRequest rq) {
         int coutnUpdate = productRepository.updateActualById(rq.isActual(), rq.getProductId());
         if (coutnUpdate != 1) {
             throw new RuntimeException("Не удалось обновить доступность продукта");
         }
         return new ChangeProductAvailableResponse(true);
+    }
+
+    private AddReviewResponse addReviewResponse(AddReviewRequest rq, Long userId) {
+        boolean isUserPurchaseProduct = integrationService.isUserPurchasedProduct(rq.getProductId(), userId);
+        if (isUserPurchaseProduct) {
+            ProductReviewEntity review = new ProductReviewEntity(userId, rq.getProductId(), rq.getReview());
+            reviewRepository.save(review);
+        } else {
+            throw new RuntimeException("Нельзя оставить отзыв на не приобретенный продукт");
+        }
+        return new AddReviewResponse(true);
+    }
+
+    private AddRatingResponse addRatingResponse(AddRatingRequest rq, Long userId) {
+        boolean isUserPurchaseProduct = integrationService.isUserPurchasedProduct(rq.getProductId(), userId);
+        if (isUserPurchaseProduct) {
+            ProductRatingEntity rating = new ProductRatingEntity(rq.getRating(), rq.getProductId(), userId);
+            ratingRepository.save(rating);
+        } else {
+            throw new RuntimeException("Нельзя оценить не приобретенный продукт");
+        }
+        return new AddRatingResponse(true);
     }
 }

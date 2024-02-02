@@ -52,7 +52,7 @@ public class UserServiceTest {
         );
         Mockito.when(repository.existsByUsername(Mockito.any())).thenReturn(true);
 
-        Assertions.assertThrows(RuntimeException.class, () -> service.create(user), "Пользователь с таким именем уже существует");
+        Assertions.assertThrows(RuntimeException.class, () -> service.create(user));
         Mockito.verify(repository, Mockito.times(0)).save(user);
     }
 
@@ -66,7 +66,7 @@ public class UserServiceTest {
         );
         Mockito.when(repository.existsByEmail(Mockito.any())).thenReturn(true);
 
-        Assertions.assertThrows(RuntimeException.class, () -> service.create(user), "Пользователь с таким email уже существует");
+        Assertions.assertThrows(RuntimeException.class, () -> service.create(user));
         Mockito.verify(repository, Mockito.times(0)).save(user);
     }
 
@@ -81,7 +81,7 @@ public class UserServiceTest {
     void changeUserPasswordFail() {
         Mockito.when(repository.updatePasswordByUsername(Mockito.any(), Mockito.any())).thenReturn(0);
 
-        Assertions.assertThrows(RuntimeException.class, () -> service.changePassword("pass", "login"), "Ошибка при обновлении пароля пользователя");
+        Assertions.assertThrows(RuntimeException.class, () -> service.changePassword("pass", "login"));
     }
 
 }

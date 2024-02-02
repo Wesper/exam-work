@@ -2,15 +2,10 @@ package ru.candle.store.productmplaceservice.controller;
 
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-import ru.candle.store.productmplaceservice.dto.request.AddProductRequest;
-import ru.candle.store.productmplaceservice.dto.request.ChangeProductAvailableRequest;
-import ru.candle.store.productmplaceservice.dto.request.GetProductCardRequest;
-import ru.candle.store.productmplaceservice.dto.request.UpdateProductRequest;
-import ru.candle.store.productmplaceservice.dto.response.AddOrUpdateProductResponse;
-import ru.candle.store.productmplaceservice.dto.response.ChangeProductAvailableResponse;
-import ru.candle.store.productmplaceservice.dto.response.GetAllProductsResponse;
-import ru.candle.store.productmplaceservice.dto.response.GetProductCardResponse;
+import ru.candle.store.productmplaceservice.dto.request.*;
+import ru.candle.store.productmplaceservice.dto.response.*;
 import ru.candle.store.productmplaceservice.service.IProductService;
 
 
@@ -27,23 +22,38 @@ public class ProductController {
     }
 
     @PostMapping(value = "/card")
-    public GetProductCardResponse getProductCard(@RequestBody @Valid GetProductCardRequest rq) {
-        return productService.getProductCard(rq);
+    public GetProductCardResponse getProductCard(@RequestBody @Valid GetProductCardRequest rq, @RequestHeader("userId") Long userId) {
+        return productService.getProductCard(rq, userId);
     }
 
+    @PreAuthorize("#role == 'ADMIN'")
     @PostMapping(value = "/add")
-    public AddOrUpdateProductResponse addProduct(@RequestBody @Valid AddProductRequest rq) {
+    public AddProductResponse addProduct(@RequestBody @Valid AddProductRequest rq, @RequestHeader("role") String role) {
         return productService.addProduct(rq);
     }
 
+    @PreAuthorize("#role == 'ADMIN'")
     @PostMapping(value = "/update")
-    public AddOrUpdateProductResponse updateProduct(@RequestBody @Valid UpdateProductRequest rq) {
+    public UpdateProductResponse updateProduct(@RequestBody @Valid UpdateProductRequest rq, @RequestHeader("role") String role) {
         return productService.updateProduct(rq);
     }
 
+    @PreAuthorize("#role == 'ADMIN'")
     @PostMapping(value = "/available/change")
-    public ChangeProductAvailableResponse changeProductAvailable(@RequestBody @Valid ChangeProductAvailableRequest rq) {
+    public ChangeProductAvailableResponse changeProductAvailable(@RequestBody @Valid ChangeProductAvailableRequest rq, @RequestHeader("role") String role) {
         return productService.changeProductAvailable(rq);
+    }
+
+    @PreAuthorize("#role == 'USER'")
+    @PostMapping(value = "/review/add")
+    public AddReviewResponse addReview(@RequestBody @Valid AddReviewRequest rq, @RequestHeader("userId") Long userId, @RequestHeader("role") String role) {
+        return productService.addReview(rq, userId);
+    }
+
+    @PreAuthorize("#role == 'USER'")
+    @PostMapping(value = "/rating/add")
+    public AddRatingResponse addProduct(@RequestBody @Valid AddRatingRequest rq, @RequestHeader("userId") Long userId, @RequestHeader("role") String role) {
+        return productService.addRating(rq, userId);
     }
 
     //TODO: Добавить работу с ошибками
