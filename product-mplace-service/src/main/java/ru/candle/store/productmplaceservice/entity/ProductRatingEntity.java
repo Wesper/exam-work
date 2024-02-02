@@ -30,4 +30,10 @@ public class ProductRatingEntity {
     @NonNull
     private Long userId;
 
+    public ProductRatingEntity(@NonNull Long id, @NonNull Long rating, @NonNull Long productId, @NonNull Long userId) {
+        this.id = id;
+        this.rating = rating;
+        this.productId = productId;
+        this.userId = userId;
+    }
 }

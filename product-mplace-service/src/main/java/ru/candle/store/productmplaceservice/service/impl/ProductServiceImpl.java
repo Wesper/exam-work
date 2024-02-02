@@ -3,7 +3,7 @@ package ru.candle.store.productmplaceservice.service.impl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import ru.candle.store.productmplaceservice.dto.AvgRatingByProduct;
+import ru.candle.store.productmplaceservice.dto.IAvgRatingByProduct;
 import ru.candle.store.productmplaceservice.dto.request.*;
 import ru.candle.store.productmplaceservice.dto.response.*;
 import ru.candle.store.productmplaceservice.entity.ProductEntity;
@@ -73,17 +73,18 @@ public class ProductServiceImpl implements IProductService, ITransactionalServic
 
     private GetAllProductsResponse getAllProductsResponse() {
         List<ProductEntity> products = productRepository.findAllByActual(true);
+        if (products == null) {
+            throw new RuntimeException("Не найдено ни одного продукта");
+        }
         List<Long> productIds = products.stream().map(ProductEntity::getId).collect(Collectors.toList());
-        List<AvgRatingByProduct> ratings = ratingRepository.getAvgRatingInGroupByProduct(productIds);
+        List<IAvgRatingByProduct> ratings = ratingRepository.getAvgRatingInGroupByProduct(productIds);
         return buildAllProductsResponse(products, ratings);
     }
 
-    private GetAllProductsResponse buildAllProductsResponse(List<ProductEntity> productsEntity, List<AvgRatingByProduct> ratingsEntity) {
-        if (productsEntity == null) {
-            throw new RuntimeException("Не найдено ни одного продукта");
-        }
+    private GetAllProductsResponse buildAllProductsResponse(List<ProductEntity> productsEntity, List<IAvgRatingByProduct> ratingsEntity) {
         GetAllProductsResponse response = new GetAllProductsResponse();
         List<Product> products = new ArrayList<>();
+        Double rating;
         for (ProductEntity productEntity : productsEntity) {
             Product product = new Product(
                     productEntity.getId(),
@@ -94,7 +95,7 @@ public class ProductServiceImpl implements IProductService, ITransactionalServic
                     productEntity.getType(),
                     null
             );
-            Double rating = ratingsEntity.stream().filter(r -> r.getProductId().equals(productEntity.getId())).mapToDouble(AvgRatingByProduct::getAvgRating).sum();
+            rating = ratingsEntity.stream().filter(r -> r.getId().equals(productEntity.getId())).mapToDouble(IAvgRatingByProduct::getAverage).sum();
             product.setRating(rating);
             products.add(product);
         }
@@ -107,7 +108,7 @@ public class ProductServiceImpl implements IProductService, ITransactionalServic
         ProductEntity product = productRepository.findById(rq.getProductId()).orElseThrow(() -> new RuntimeException("Продукт не найден"));
         List<ProductReviewEntity> review = reviewRepository.findAllByProductId(product.getId());
         Double rating = ratingRepository.getAvgRatingByProduct(rq.getProductId());
-        Integer countAppreciated = ratingRepository.findByUserId(userId);
+        Integer countAppreciated = ratingRepository.findByUserIdAndProductId(userId, rq.getProductId());
         return buildProductCardResponse(product, rating, countAppreciated, review, userId);
     }
 
@@ -123,7 +124,7 @@ public class ProductServiceImpl implements IProductService, ITransactionalServic
             }
         }
         avgRating = avgRating != null ? avgRating : 0;
-        boolean appreciated = countAppreciated > 0;
+        boolean appreciated = countAppreciated == null || countAppreciated == 1;
 
         return GetProductCardResponse.builder()
                 .productId(productEntity.getId())
@@ -132,6 +133,7 @@ public class ProductServiceImpl implements IProductService, ITransactionalServic
                 .description(productEntity.getDescription())
                 .price(productEntity.getPrice())
                 .measure(productEntity.getMeasure())
+                .unitMeasure(productEntity.getUnitMeasure())
                 .type(productEntity.getType())
                 .rating(avgRating)
                 .appreciated(appreciated)

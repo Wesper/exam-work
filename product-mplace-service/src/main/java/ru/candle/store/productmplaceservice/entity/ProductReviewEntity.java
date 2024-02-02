@@ -29,4 +29,11 @@ public class ProductReviewEntity {
     @Column(name = "review")
     @NonNull
     private String review;
+
+    public ProductReviewEntity(@NonNull Long id, @NonNull Long userId, @NonNull Long productId, @NonNull String review) {
+        this.id = id;
+        this.userId = userId;
+        this.productId = productId;
+        this.review = review;
+    }
 }
