@@ -76,6 +76,7 @@ public class JwtService {
     public UserEntity getClaims(String token) {
         Claims claims = extractAllClaims(token);
         UserEntity userEntity = new UserEntity();
+        userEntity.setId(Long.valueOf(claims.get("id").toString()));
         userEntity.setUsername(claims.getSubject());
         userEntity.setEmail(claims.get("email").toString());
         userEntity.setRole(Role.valueOf(claims.get("role").toString()));

@@ -40,7 +40,7 @@ public class AuthenticationService {
                 Role.ROLE_USER
         );
 
-        userService.create(user);
+        user = userService.create(user);
 
         String jwt = jwtService.generateToken(user);
         return new JwtAuthenticationResponse(jwt);
@@ -86,6 +86,7 @@ public class AuthenticationService {
     public GetTokenInfoResponse getTokenInfo(GetTokenInfoRequest request) {
         UserEntity userEntity = jwtService.getClaims(request.getToken());
         return new GetTokenInfoResponse(
+                userEntity.getId(),
                 userEntity.getUsername(),
                 userEntity.getEmail(),
                 userEntity.getRole().name()

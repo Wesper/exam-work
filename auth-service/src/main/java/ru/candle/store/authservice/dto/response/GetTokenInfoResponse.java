@@ -8,7 +8,8 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class GetTokenInfoResponse {
-//TODO: возвращать id
+
+    private Long userId;
     private String username;
     private String email;
     private String role;

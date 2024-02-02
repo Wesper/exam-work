@@ -92,10 +92,10 @@ public class AuthenticationControllerTest {
     @Test
     void WhenGetTokenInfoSuccess() throws Exception {
         String requset = "{\"token\": \"token\"}";
-        Mockito.when(authenticationService.getTokenInfo(Mockito.any())).thenReturn(new GetTokenInfoResponse("one", "one@one.ru", "ROLE_USER"));
+        Mockito.when(authenticationService.getTokenInfo(Mockito.any())).thenReturn(new GetTokenInfoResponse(1L ,"one", "one@one.ru", "ROLE_USER"));
         mockMvc.perform(MockMvcRequestBuilders.post("/auth/token/info/get").content(requset).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(content().json("{\"username\": \"one\", \"email\": \"one@one.ru\", \"role\": \"ROLE_USER\"}"));
+                .andExpect(content().json("{\"userId\": 1, \"username\": \"one\", \"email\": \"one@one.ru\", \"role\": \"ROLE_USER\"}"));
     }
 
     @Test

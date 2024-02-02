@@ -69,6 +69,7 @@ public class JwtServiceTest {
     @Test
     void WhenClaimsExtractCorrect() {
         UserEntity expectedUser = new UserEntity(
+                1L,
                 "One",
                 "OnePass",
                 "one@one.ru",

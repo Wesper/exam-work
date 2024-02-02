@@ -54,6 +54,7 @@ public class AuthenticationFilter extends AbstractGatewayFilterFactory<Authentic
                     GetTokenInfoResponse getTokenInfoResponse = restTemplate.postForObject("http://auth-service/auth/token/info/get", new GetTokenInfoRequest(authToken), GetTokenInfoResponse.class);
                     userInfoHeaders = exchange.getRequest()
                             .mutate()
+                            .header("userId", String.valueOf(getTokenInfoResponse.getUserId()))
                             .header("username", getTokenInfoResponse.getUsername())
                             .header("email", getTokenInfoResponse.getEmail())
                             .header("role", getTokenInfoResponse.getRole())

@@ -9,6 +9,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class GetTokenInfoResponse {
 
+    private Long userId;
     private String username;
     private String email;
     private String role;
