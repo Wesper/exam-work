@@ -15,6 +15,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import ru.candle.store.productmplaceservice.config.ProductConfig;
 import ru.candle.store.productmplaceservice.controller.ProductController;
+import ru.candle.store.productmplaceservice.dto.Product;
 import ru.candle.store.productmplaceservice.dto.request.*;
 import ru.candle.store.productmplaceservice.dto.response.*;
 import ru.candle.store.productmplaceservice.service.impl.ProductServiceImpl;

@@ -26,6 +26,12 @@ public class ProductController {
         return productService.getProductCard(rq, userId);
     }
 
+    @PreAuthorize("#role == 'MANAGER'")
+    @PostMapping(value = "/info/get")
+    public GetProductsInfoResponse getProductInfoCard(@RequestBody @Valid GetProductsInfoRequest rq, @RequestHeader("role") String role) {
+        return productService.getProductInfoByIds(rq);
+    }
+
     @PreAuthorize("#role == 'ADMIN'")
     @PostMapping(value = "/add")
     public AddProductResponse addProduct(@RequestBody @Valid AddProductRequest rq, @RequestHeader("role") String role) {

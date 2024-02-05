@@ -8,6 +8,8 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import ru.candle.store.productmplaceservice.dto.IAvgRatingByProduct;
+import ru.candle.store.productmplaceservice.dto.Product;
+import ru.candle.store.productmplaceservice.dto.Review;
 import ru.candle.store.productmplaceservice.dto.request.*;
 import ru.candle.store.productmplaceservice.dto.response.*;
 import ru.candle.store.productmplaceservice.entity.ProductEntity;

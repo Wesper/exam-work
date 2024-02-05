@@ -16,7 +16,7 @@ public class ProfileController {
     @Autowired
     IProfileService profileService;
 
-    @PreAuthorize("#role == 'USER'")
+    @PreAuthorize("#role == 'USER' || #role == 'MANAGER'")
     @GetMapping(value = "/get")
     public GetProfileResponse getUserProfile(@RequestHeader("role") String role, @RequestHeader("userId") Long userId) {
         return profileService.getUserProfile(userId);

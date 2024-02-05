@@ -1,4 +1,4 @@
-package ru.candle.store.productmplaceservice.dto.response;
+package ru.candle.store.productmplaceservice.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -9,13 +9,16 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class Product {
+public class ProductInfo {
 
     private Long productId;
     private String imageId;
     private String title;
+    private String description;
     private String subtitle;
     private Long price;
     private String type;
-    private Double rating;
+    private String measure;
+    private String unitMeasure;
+    private Boolean actual;
 }

@@ -86,6 +86,7 @@ public class AuthenticationService {
     public GetTokenInfoResponse getTokenInfo(GetTokenInfoRequest request) {
         UserEntity userEntity = jwtService.getClaims(request.getToken());
         return new GetTokenInfoResponse(
+                userEntity.getId(),
                 userEntity.getUsername(),
                 userEntity.getEmail(),
                 userEntity.getRole().name()
