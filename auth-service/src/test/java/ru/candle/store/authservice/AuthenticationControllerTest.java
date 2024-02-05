@@ -10,10 +10,8 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
-import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import ru.candle.store.authservice.config.JwtAuthenticationFilter;
 import ru.candle.store.authservice.controller.AuthenticationController;
-import ru.candle.store.authservice.dto.request.GetTokenInfoRequest;
 import ru.candle.store.authservice.dto.response.ChangePasswordResponse;
 import ru.candle.store.authservice.dto.response.GetTokenInfoResponse;
 import ru.candle.store.authservice.dto.response.JwtAuthenticationResponse;
@@ -39,7 +37,7 @@ public class AuthenticationControllerTest {
     private ObjectMapper objectMapper = new ObjectMapper();
 
     @Test
-    void WhenSignUpSuccess() throws Exception {
+    void whenSignUpSuccess() throws Exception {
         String requset = "{\"username\": \"one\", \"password\":  \"onepass\", \"email\": \"one@one.ru\"}";
         Mockito.when(authenticationService.signUp(Mockito.any())).thenReturn(new JwtAuthenticationResponse("token"));
         mockMvc.perform(MockMvcRequestBuilders.post("/auth/signUp").content(requset).contentType(MediaType.APPLICATION_JSON))
@@ -48,7 +46,7 @@ public class AuthenticationControllerTest {
     }
 
     @Test
-    void WhenSignUpFail() throws Exception {
+    void whenSignUpFail() throws Exception {
         String requset = "{\"username\": \"one\", \"password\":  \"onepass\"}";
         Mockito.when(authenticationService.signUp(Mockito.any())).thenReturn(new JwtAuthenticationResponse("token"));
         mockMvc.perform(MockMvcRequestBuilders.post("/auth/signUp").content(requset).contentType(MediaType.APPLICATION_JSON))
@@ -56,7 +54,7 @@ public class AuthenticationControllerTest {
     }
 
     @Test
-    void WhenSignInSuccess() throws Exception {
+    void whenSignInSuccess() throws Exception {
         String requset = "{\"username\": \"one\", \"password\":  \"onepass\"}";
         Mockito.when(authenticationService.signIn(Mockito.any())).thenReturn(new JwtAuthenticationResponse("token"));
         mockMvc.perform(MockMvcRequestBuilders.post("/auth/signIn").content(requset).contentType(MediaType.APPLICATION_JSON))
@@ -65,7 +63,7 @@ public class AuthenticationControllerTest {
     }
 
     @Test
-    void WhenSignInFail() throws Exception {
+    void whenSignInFail() throws Exception {
         String requset = "{\"username\": \"one\"}";
         Mockito.when(authenticationService.signIn(Mockito.any())).thenReturn(new JwtAuthenticationResponse("token"));
         mockMvc.perform(MockMvcRequestBuilders.post("/auth/signIn").content(requset).contentType(MediaType.APPLICATION_JSON))
@@ -73,7 +71,7 @@ public class AuthenticationControllerTest {
     }
 
     @Test
-    void WhenValidateSuccess() throws Exception {
+    void whenValidateSuccess() throws Exception {
         String requset = "{\"token\": \"token\"}";
         Mockito.when(authenticationService.isValid(Mockito.any())).thenReturn(new ValidateResponse(true));
         mockMvc.perform(MockMvcRequestBuilders.post("/auth/validate").content(requset).contentType(MediaType.APPLICATION_JSON))
@@ -82,7 +80,7 @@ public class AuthenticationControllerTest {
     }
 
     @Test
-    void WhenValidateFail() throws Exception {
+    void whenValidateFail() throws Exception {
         String requset = "{\"token\": \"\"}";
         Mockito.when(authenticationService.isValid(Mockito.any())).thenReturn(new ValidateResponse(true));
         mockMvc.perform(MockMvcRequestBuilders.post("/auth/validate").content(requset).contentType(MediaType.APPLICATION_JSON))
@@ -90,16 +88,16 @@ public class AuthenticationControllerTest {
     }
 
     @Test
-    void WhenGetTokenInfoSuccess() throws Exception {
+    void whenGetTokenInfoSuccess() throws Exception {
         String requset = "{\"token\": \"token\"}";
-        Mockito.when(authenticationService.getTokenInfo(Mockito.any())).thenReturn(new GetTokenInfoResponse(1L ,"one", "one@one.ru", "ROLE_USER"));
+        Mockito.when(authenticationService.getTokenInfo(Mockito.any())).thenReturn(new GetTokenInfoResponse(1L, "one", "one@one.ru", "ROLE_USER"));
         mockMvc.perform(MockMvcRequestBuilders.post("/auth/token/info/get").content(requset).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().json("{\"userId\": 1, \"username\": \"one\", \"email\": \"one@one.ru\", \"role\": \"ROLE_USER\"}"));
     }
 
     @Test
-    void WhenGetTokenInfoFail() throws Exception {
+    void whenGetTokenInfoFail() throws Exception {
         String requset = "{\"token\": \"\"}";
         Mockito.when(authenticationService.getTokenInfo(Mockito.any())).thenThrow(RuntimeException.class);
         mockMvc.perform(MockMvcRequestBuilders.post("/auth/token/info/get").content(requset).contentType(MediaType.APPLICATION_JSON))
@@ -107,7 +105,7 @@ public class AuthenticationControllerTest {
     }
 
     @Test
-    void WhenChangePasswordSuccess() throws Exception {
+    void whenChangePasswordSuccess() throws Exception {
         String requset = "{\"username\": \"userlogin\", \"currentPassword\": \"password1\", \"newPassword\": \"password2\"}";
         Mockito.when(authenticationService.changePassword(Mockito.any())).thenReturn(new ChangePasswordResponse(true));
         mockMvc.perform(MockMvcRequestBuilders.post("/auth/password/change").content(requset).contentType(MediaType.APPLICATION_JSON))
@@ -116,7 +114,7 @@ public class AuthenticationControllerTest {
     }
 
     @Test
-    void WhenChangePasswordFail() throws Exception {
+    void whenChangePasswordFail() throws Exception {
         String requset = "{\"username\": \"user\", \"currentPassword\": \"pass1\"}";
         Mockito.when(authenticationService.getTokenInfo(Mockito.any())).thenThrow(RuntimeException.class);
         mockMvc.perform(MockMvcRequestBuilders.post("/auth/password/change").content(requset).contentType(MediaType.APPLICATION_JSON))

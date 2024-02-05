@@ -5,15 +5,11 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 import ru.candle.store.authservice.dictionary.Role;
 import ru.candle.store.authservice.entity.UserEntity;
-import ru.candle.store.authservice.repository.UserRepository;
 import ru.candle.store.authservice.service.JwtService;
-import ru.candle.store.authservice.service.UserService;
 
 
 @ExtendWith(MockitoExtension.class)
@@ -29,7 +25,7 @@ public class JwtServiceTest {
     }
 
     @Test
-    void WhenExtractUsernameFromTokenSuccess() {
+    void whenExtractUsernameFromTokenSuccess() {
         UserEntity user = new UserEntity(
                 "One",
                 "OnePass",
@@ -41,13 +37,13 @@ public class JwtServiceTest {
     }
 
     @Test
-    void WhenExtractUsernameFromTokenFail() {
+    void whenExtractUsernameFromTokenFail() {
         String token = "";
         Assertions.assertThrows(IllegalArgumentException.class, () -> service.extractUsername(token));
     }
 
     @Test
-    void WhenTokenValidSuccess() {
+    void whenTokenValidSuccess() {
         UserEntity user = new UserEntity(
                 "One",
                 "OnePass",
@@ -60,14 +56,14 @@ public class JwtServiceTest {
     }
 
     @Test
-    void WHenTokenNotValid() {
+    void wHenTokenNotValid() {
         String token = "teststring";
 
         Assertions.assertFalse(service.isTokenValid(token));
     }
 
     @Test
-    void WhenClaimsExtractCorrect() {
+    void whenClaimsExtractCorrect() {
         UserEntity expectedUser = new UserEntity(
                 1L,
                 "One",

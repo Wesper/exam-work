@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import ru.candle.store.productmplaceservice.dto.Product;
 
 import java.util.List;
 

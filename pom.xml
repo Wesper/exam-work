@@ -21,6 +21,8 @@
         <module>gateway-server</module>
         <module>auth-service</module>
         <module>product-mplace-service</module>
+        <module>profile-service</module>
+        <module>order-service</module>
     </modules>
 
 </project>

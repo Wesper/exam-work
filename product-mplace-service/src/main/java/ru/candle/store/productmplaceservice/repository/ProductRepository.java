@@ -15,4 +15,6 @@ public interface ProductRepository extends JpaRepository<ProductEntity, Long> {
     @Modifying
     @Query(value = "UPDATE products.products SET actual = :actual WHERE id = :productId", nativeQuery = true)
     int updateActualById(@Param("actual") Boolean actual, @Param("productId") Long productId);
+    @Query(value = "SELECT * FROM products.products WHERE id IN (:ids)", nativeQuery = true)
+    List<ProductEntity> findByIds(@Param("ids") List<Long> ids);
 }

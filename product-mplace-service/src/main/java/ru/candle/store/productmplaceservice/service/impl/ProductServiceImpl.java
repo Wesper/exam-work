@@ -4,6 +4,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.candle.store.productmplaceservice.dto.IAvgRatingByProduct;
+import ru.candle.store.productmplaceservice.dto.Product;
+import ru.candle.store.productmplaceservice.dto.ProductInfo;
+import ru.candle.store.productmplaceservice.dto.Review;
 import ru.candle.store.productmplaceservice.dto.request.*;
 import ru.candle.store.productmplaceservice.dto.response.*;
 import ru.candle.store.productmplaceservice.entity.ProductEntity;
@@ -69,6 +72,11 @@ public class ProductServiceImpl implements IProductService, ITransactionalServic
     @Override
     public AddRatingResponse addRating(AddRatingRequest rq, Long userId) {
         return addRatingResponse(rq, userId);
+    }
+
+    @Override
+    public GetProductsInfoResponse getProductInfoByIds(GetProductsInfoRequest rq) {
+        return getProductInfoResponse(rq);
     }
 
     private GetAllProductsResponse getAllProductsResponse() {
@@ -204,5 +212,28 @@ public class ProductServiceImpl implements IProductService, ITransactionalServic
             throw new RuntimeException("Нельзя оценить не приобретенный продукт");
         }
         return new AddRatingResponse(true);
+    }
+
+    public GetProductsInfoResponse getProductInfoResponse(GetProductsInfoRequest rq) {
+        List<ProductEntity> products = productRepository.findByIds(rq.getProductIds());
+        if (products.isEmpty()) {
+            throw new RuntimeException("Продукты с указанным ID не найдены");
+        }
+        List<ProductInfo> productsInfo = new ArrayList<>();
+        products.forEach(product -> {
+            productsInfo.add(new ProductInfo(
+               product.getId(),
+                    product.getImageId(),
+                    product.getTitle(),
+                    product.getDescription(),
+                    product.getSubtitle(),
+                    product.getPrice(),
+                    product.getType(),
+                    product.getMeasure(),
+                    product.getUnitMeasure(),
+                    product.getActual()
+            ));
+        });
+        return new GetProductsInfoResponse(productsInfo);
     }
 }
