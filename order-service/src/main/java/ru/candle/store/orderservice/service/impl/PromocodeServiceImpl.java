@@ -7,7 +7,7 @@ import ru.candle.store.orderservice.dto.request.promocodes.ChangePromocodeActual
 import ru.candle.store.orderservice.dto.response.Promocode;
 import ru.candle.store.orderservice.dto.response.promocodes.AddPromocodeResponse;
 import ru.candle.store.orderservice.dto.response.promocodes.ChangePromocodeActualResponse;
-import ru.candle.store.orderservice.dto.response.promocodes.GetAllPromocodeResponse;
+import ru.candle.store.orderservice.dto.response.promocodes.GetAllPromocodesResponse;
 import ru.candle.store.orderservice.dto.response.promocodes.GetPromocodeResponse;
 import ru.candle.store.orderservice.entity.PromocodeEntity;
 import ru.candle.store.orderservice.repository.PromocodeRepository;
@@ -29,7 +29,7 @@ public class PromocodeServiceImpl implements IPromocodeService {
 
     @Override
     public GetPromocodeResponse getPromocode(String promocode) {
-        return getPromocode(promocode);
+        return getPromocodeResponse(promocode);
     }
 
     @Override
@@ -38,12 +38,12 @@ public class PromocodeServiceImpl implements IPromocodeService {
     }
 
     @Override
-    public GetAllPromocodeResponse getAllPromocodes() {
+    public GetAllPromocodesResponse getAllPromocodes() {
         return getAllPromocodesResponse();
     }
 
     private AddPromocodeResponse addPromocodeResponse(AddPromocodeRequest rq) {
-        PromocodeEntity promocodeEntity = new PromocodeEntity(rq.getPromocode(), rq.getPercent(), rq.isActual());
+        PromocodeEntity promocodeEntity = new PromocodeEntity(rq.getPromocode(), rq.getPercent(), rq.getActual());
         promocodeRepository.save(promocodeEntity);
         return new AddPromocodeResponse(true);
     }
@@ -66,7 +66,7 @@ public class PromocodeServiceImpl implements IPromocodeService {
         return new ChangePromocodeActualResponse(true);
     }
 
-    private GetAllPromocodeResponse getAllPromocodesResponse() {
+    private GetAllPromocodesResponse getAllPromocodesResponse() {
         List<PromocodeEntity> promocodeEntities = promocodeRepository.findAll();
         if (promocodeEntities.isEmpty()) {
             throw new RuntimeException("Промокодов нет");
@@ -79,6 +79,6 @@ public class PromocodeServiceImpl implements IPromocodeService {
                     p.getActual()
             ));
         });
-        return new GetAllPromocodeResponse(promocodes);
+        return new GetAllPromocodesResponse(promocodes);
     }
 }

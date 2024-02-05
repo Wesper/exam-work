@@ -6,7 +6,6 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import ru.candle.store.orderservice.entity.BasketEntity;
-import ru.candle.store.orderservice.entity.ProductEntity;
 
 import java.util.List;
 
@@ -14,7 +13,7 @@ import java.util.List;
 public interface BasketRepository extends JpaRepository<BasketEntity, Long> {
 
     Integer deleteByProductIdAndUserId(Long productId, Long userId);
-    Boolean existByProductIdAndUserId(Long productId, Long userId);
+    boolean existsBasketEntityByProductIdAndUserId(Long productId, Long userId);
     void deleteByUserId(Long userId);
     List<BasketEntity> findByUserId(Long userId);
     @Modifying

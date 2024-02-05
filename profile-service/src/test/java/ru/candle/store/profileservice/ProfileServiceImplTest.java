@@ -12,7 +12,6 @@ import ru.candle.store.profileservice.dto.response.GetProfileResponse;
 import ru.candle.store.profileservice.dto.response.SaveProfileResponse;
 import ru.candle.store.profileservice.entity.ProfileEntity;
 import ru.candle.store.profileservice.repository.ProfileRepository;
-import ru.candle.store.profileservice.service.IProfileService;
 import ru.candle.store.profileservice.service.Impl.ProfileServiceImpl;
 
 import java.util.Optional;
@@ -27,7 +26,7 @@ public class ProfileServiceImplTest {
     ProfileServiceImpl service;
 
     @Test
-    void WhenGetProfileNotFound() {
+    void whenGetProfileNotFound() {
         Mockito.when(repository.findById(1L)).thenReturn(null);
 
         Assertions.assertThrows(RuntimeException.class, () -> service.getUserProfile(1L));
@@ -35,7 +34,7 @@ public class ProfileServiceImplTest {
     }
 
     @Test
-    void WhenGetProfileFound() {
+    void whenGetProfileFound() {
         ProfileEntity profile = new ProfileEntity(1L, "First", "Last", "Middle", "City", "1990-01-01", "Address");
         Mockito.when(repository.findById(1L)).thenReturn(Optional.of(profile));
         GetProfileResponse expResponse = new GetProfileResponse("First", "Last", "Middle", "City", "1990-01-01", "Address");
@@ -46,7 +45,7 @@ public class ProfileServiceImplTest {
     }
 
     @Test
-    void WhenSaveProfileSuccess() {
+    void whenSaveProfileSuccess() {
         ProfileEntity profile = new ProfileEntity(1L, "First", "Last", "Middle", "City", "1990-01-01", "Address");
         Mockito.when(repository.save(profile)).thenReturn(profile);
         SaveProfileRequest request = new SaveProfileRequest("First", "Last", "Middle", "City", "1990-01-01", "Address");
@@ -58,7 +57,7 @@ public class ProfileServiceImplTest {
     }
 
     @Test
-    void WhenSaveProfileFail() {
+    void whenSaveProfileFail() {
         ProfileEntity profile = new ProfileEntity(1L, "First", "Last", "Middle", "City", "1990-01-01", "Address");
         Mockito.when(repository.save(profile)).thenThrow(RuntimeException.class);
         SaveProfileRequest request = new SaveProfileRequest("First", "Last", "Middle", "City", "1990-01-01", "Address");

@@ -16,7 +16,7 @@ import java.util.List;
 public class Order {
 
     private Long orderId;
-    private LocalDateTime date;
+    private String date;
     private Long totalPrice;
     private Long totalPromoPrice;
     private Status status;

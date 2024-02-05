@@ -20,7 +20,7 @@ public class GetOrderResponse {
     private String firstName;
     private String lastName;
     private String address;
-    private LocalDateTime date;
+    private String date;
     private String promocode;
     private Long totalPrice;
     private Long totalPromoPrice;

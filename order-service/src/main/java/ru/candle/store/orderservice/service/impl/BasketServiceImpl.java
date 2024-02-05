@@ -75,7 +75,7 @@ public class BasketServiceImpl implements IBasketService {
     }
 
     private DeleteProductResponse deleteProductResponse(DeleteProductRequest rq, Long userId) {
-        boolean productIsExist = basketRepository.existByProductIdAndUserId(rq.getProductId(), userId);
+        boolean productIsExist = basketRepository.existsBasketEntityByProductIdAndUserId(rq.getProductId(), userId);
         if (!productIsExist) {
             throw new RuntimeException("У пользователя нет запрашиваемого продукта");
         }
@@ -87,7 +87,7 @@ public class BasketServiceImpl implements IBasketService {
     }
 
     private ChangeCountProductResponse changeCountProductResponse(ChangeCountProductRequest rq, Long userId) {
-        boolean productIsExist = basketRepository.existByProductIdAndUserId(rq.getProductId(), userId);
+        boolean productIsExist = basketRepository.existsBasketEntityByProductIdAndUserId(rq.getProductId(), userId);
         if (!productIsExist) {
             throw new RuntimeException("У пользователя нет запрашиваемого продукта");
         }
@@ -139,6 +139,9 @@ public class BasketServiceImpl implements IBasketService {
         if (promocodeEntity == null) {
             throw new RuntimeException("Промокода не существует");
         }
+        if (!promocodeEntity.getActual()) {
+            throw new RuntimeException("Промокод не активный");
+        }
         List<BasketEntity> basketEntities = basketRepository.findByUserId(userId);
         if (basketEntities.isEmpty()) {
             throw new RuntimeException("У пользователя нет продуктов в корзине");
@@ -162,11 +165,11 @@ public class BasketServiceImpl implements IBasketService {
                     productInfo.getImageId(),
                     productInfo.getTitle(),
                     productInfo.getPrice(),
-                    productInfo.getPrice() * promocodeEntity.getPercent() / 100,
+                    (long) (productInfo.getPrice() * (1 - promocodeEntity.getPercent() / 100.00)),
                     basketEntity.getCount()
             ));
             totalPrice.updateAndGet(v -> v + productInfo.getPrice() * basketEntity.getCount());
-            totalPromoPrice.updateAndGet(v -> v + (productInfo.getPrice() * promocodeEntity.getPercent() / 100) * basketEntity.getCount());
+            totalPromoPrice.updateAndGet(v -> (long) (v + (productInfo.getPrice() * (1 - promocodeEntity.getPercent() / 100.00)) * basketEntity.getCount()));
         });
         return new ApplyPromocodeResponse(productsResponse, totalPrice.get(), totalPromoPrice.get());
     }

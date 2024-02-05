@@ -45,7 +45,7 @@ public class ProductServiceTest {
     ProductServiceImpl productService;
 
     @Test
-    void WhenRequestAllProductsButThereNone() {
+    void whenRequestAllProductsButThereNone() {
         Mockito.when(productRepository.findAllByActual(true)).thenReturn(null);
 
         Assertions.assertThrows(RuntimeException.class, () -> productService.getAllProducts());
@@ -54,7 +54,7 @@ public class ProductServiceTest {
     }
 
     @Test
-    void WhenRequestAllProductsSuccess() {
+    void whenRequestAllProductsSuccess() {
         List<ProductEntity> products = new ArrayList<>();
         products.add(new ProductEntity(1L, "a.jpeg", "Product 1", "If you buy the product you win", "Best of product", 1L, "A", "1", "kg", true));
         products.add(new ProductEntity(2L, "b.jpeg", "Product 2", "If you buy the product you win", "Best of product", 2L, "B", "2", "kg", true));
@@ -79,7 +79,7 @@ public class ProductServiceTest {
     }
 
     @Test
-    void WhenRequestProductCardButThereNone() {
+    void whenRequestProductCardButThereNone() {
         Long userId = 1L;
         GetProductCardRequest request = new GetProductCardRequest(2L);
         Mockito.when(productRepository.findById(Mockito.any())).thenReturn(null);
@@ -92,7 +92,7 @@ public class ProductServiceTest {
     }
 
     @Test
-    void WhenRequestProductCardSuccess() {
+    void whenRequestProductCardSuccess() {
         Long userId = 1L;
         GetProductCardRequest request = new GetProductCardRequest(2L);
         ProductEntity product = new ProductEntity(2L, "a.jpeg", "Product 2", "If you buy the product you win", "Best of product", 1L, "A", "1", "kg", true);
@@ -119,7 +119,7 @@ public class ProductServiceTest {
     }
 
     @Test
-    void WhenRequestProductCardWithoutRatingAndReviewSuccess() {
+    void whenRequestProductCardWithoutRatingAndReviewSuccess() {
         Long userId = 1L;
         GetProductCardRequest request = new GetProductCardRequest(2L);
         ProductEntity product = new ProductEntity(2L, "a.jpeg", "Product 2", "If you buy the product you win", "Best of product", 1L, "A", "1", "kg", true);
@@ -141,7 +141,7 @@ public class ProductServiceTest {
     }
 
     @Test
-    void WhenAddProductSuccess() {
+    void whenAddProductSuccess() {
         Mockito.when(productRepository.save(Mockito.any())).thenReturn(Mockito.any());
         AddProductRequest request = new AddProductRequest("a.jpeg", "title", "description", "subtitle", 1L, "type", "measure", "unit", true);
 
@@ -151,7 +151,7 @@ public class ProductServiceTest {
     }
 
     @Test
-    void WhenAddProductFail() {
+    void whenAddProductFail() {
         Mockito.when(productRepository.save(Mockito.any())).thenThrow(IllegalArgumentException.class);
         AddProductRequest request = new AddProductRequest("a.jpeg", "title", "description", "subtitle", 1L, "type", "measure", "unit", true);
 
@@ -160,7 +160,7 @@ public class ProductServiceTest {
     }
 
     @Test
-    void WhenUpdateProductSuccess() {
+    void whenUpdateProductSuccess() {
         Mockito.when(productRepository.save(Mockito.any())).thenReturn(Mockito.any());
         UpdateProductRequest request = new UpdateProductRequest(1L, "a.jpeg", "title", "description", "subtitle", 1L, "type", "measure", "unit", true);
 
@@ -170,7 +170,7 @@ public class ProductServiceTest {
     }
 
     @Test
-    void WhenUpdateProductFail() {
+    void whenUpdateProductFail() {
         Mockito.when(productRepository.save(Mockito.any())).thenThrow(IllegalArgumentException.class);
         UpdateProductRequest request = new UpdateProductRequest(1L, "a.jpeg", "title", "description", "subtitle", 1L, "type", "measure", "unit", true);
 
@@ -179,7 +179,7 @@ public class ProductServiceTest {
     }
 
     @Test
-    void WhenChangeProductAvailableSuccess() {
+    void whenChangeProductAvailableSuccess() {
         Mockito.when(productRepository.updateActualById(Mockito.any(), Mockito.any())).thenReturn(1);
         ChangeProductAvailableRequest request = new ChangeProductAvailableRequest(1L, false);
 
@@ -189,7 +189,7 @@ public class ProductServiceTest {
     }
 
     @Test
-    void WhenChangeProductAvailableFail() {
+    void whenChangeProductAvailableFail() {
         Mockito.when(productRepository.updateActualById(Mockito.any(), Mockito.any())).thenReturn(0);
         ChangeProductAvailableRequest request = new ChangeProductAvailableRequest(1L, false);
 
@@ -198,7 +198,7 @@ public class ProductServiceTest {
     }
 
     @Test
-    void WhenAddReviewSuccess() {
+    void whenAddReviewSuccess() {
         Long userId = 1L;
         ProductReviewEntity review = new ProductReviewEntity(1L, 1L, "review");
         Mockito.when(reviewRepository.save(review)).thenReturn(review);
@@ -212,7 +212,7 @@ public class ProductServiceTest {
     }
 
     @Test
-    void WhenAddReviewFail() {
+    void whenAddReviewFail() {
         Long userId = 1L;
         ProductReviewEntity review = new ProductReviewEntity(1L, 1L, "review");
         Mockito.when(integrationService.isUserPurchasedProduct(1L, 1L)).thenReturn(false);
@@ -224,7 +224,7 @@ public class ProductServiceTest {
     }
 
     @Test
-    void WhenAddRatingSuccess() {
+    void whenAddRatingSuccess() {
         Long userId = 1L;
         ProductRatingEntity review = new ProductRatingEntity(1L, 1L, 1L);
         Mockito.when(ratingRepository.save(review)).thenReturn(review);
@@ -238,7 +238,7 @@ public class ProductServiceTest {
     }
 
     @Test
-    void WhenAddRatingFail() {
+    void whenAddRatingFail() {
         Long userId = 1L;
         ProductRatingEntity review = new ProductRatingEntity(1L, 1L, 1L);
         Mockito.when(integrationService.isUserPurchasedProduct(1L, 1L)).thenReturn(false);

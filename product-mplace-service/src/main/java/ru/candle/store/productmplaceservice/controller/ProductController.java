@@ -26,7 +26,7 @@ public class ProductController {
         return productService.getProductCard(rq, userId);
     }
 
-    @PreAuthorize("#role == 'MANAGER'")
+    @PreAuthorize("#role == 'USER'")
     @PostMapping(value = "/info/get")
     public GetProductsInfoResponse getProductInfoCard(@RequestBody @Valid GetProductsInfoRequest rq, @RequestHeader("role") String role) {
         return productService.getProductInfoByIds(rq);

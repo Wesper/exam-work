@@ -12,7 +12,7 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class GetAllPromocodeResponse {
+public class GetAllPromocodesResponse {
 
     private List<Promocode> promocodes;
 }

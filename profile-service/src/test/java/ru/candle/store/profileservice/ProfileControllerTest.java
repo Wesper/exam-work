@@ -36,7 +36,7 @@ public class ProfileControllerTest {
     private ObjectMapper objectMapper = new ObjectMapper();
 
     @Test
-    void WhenRequestGetProfileSuccess() throws Exception {
+    void whenRequestGetProfileSuccess() throws Exception {
         Long userId = 1L;
         GetProfileResponse response = new GetProfileResponse("Firstname", "Lastname", "Middlename", "City", "1990-01-01", "Address");
         Mockito.when(service.getUserProfile(userId)).thenReturn(response);
@@ -47,7 +47,7 @@ public class ProfileControllerTest {
     }
 
     @Test
-    void WhenRequestGetProfileWithoutHeadersFail() throws Exception {
+    void whenRequestGetProfileWithoutHeadersFail() throws Exception {
         Long userId = 1L;
         GetProfileResponse response = new GetProfileResponse("Firstname", "Lastname", "Middlename", "City", "1990-01-01", "Address");
         Mockito.when(service.getUserProfile(userId)).thenReturn(response);
@@ -66,7 +66,7 @@ public class ProfileControllerTest {
     }
 
     @Test
-    void WhenRequestGetProfileFail() throws Exception {
+    void whenRequestGetProfileFail() throws Exception {
         Long userId = 1L;
         Mockito.when(service.getUserProfile(userId)).thenThrow(RuntimeException.class);
 
@@ -74,7 +74,7 @@ public class ProfileControllerTest {
     }
 
     @Test
-    void WhenRequestSaveProfileSuccess() throws Exception {
+    void whenRequestSaveProfileSuccess() throws Exception {
         Long userId = 1L;
         SaveProfileRequest rq = new SaveProfileRequest("Firstname", "Lastname", "Middlename", "City", "1990-01-01", "Address");
         SaveProfileResponse response = new SaveProfileResponse(true);
@@ -86,7 +86,7 @@ public class ProfileControllerTest {
     }
 
     @Test
-    void WhenRequestSaveProfileWithoutHeadersFail() throws Exception {
+    void whenRequestSaveProfileWithoutHeadersFail() throws Exception {
         Long userId = 1L;
         SaveProfileRequest rq = new SaveProfileRequest("Firstname", "Lastname", "Middlename", "City", "1990-01-01", "Address");
         SaveProfileResponse response = new SaveProfileResponse(true);
@@ -106,7 +106,7 @@ public class ProfileControllerTest {
     }
 
     @Test
-    void WhenRequestSaveProfileFail() throws Exception {
+    void whenRequestSaveProfileFail() throws Exception {
         Long userId = 1L;
         SaveProfileRequest rq = new SaveProfileRequest("Firstname", "Lastname", "Middlename", "City", "1990-01-01", "Address");
         Mockito.when(service.saveUserProfile(rq, userId)).thenThrow(RuntimeException.class);

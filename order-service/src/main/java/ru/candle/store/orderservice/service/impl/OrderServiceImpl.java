@@ -8,6 +8,7 @@ import ru.candle.store.orderservice.dto.request.order.AddOrderRequest;
 import ru.candle.store.orderservice.dto.request.order.ChangeOrderStatusRequest;
 import ru.candle.store.orderservice.dto.request.order.GetAllOrdersByStatusRequest;
 import ru.candle.store.orderservice.dto.request.order.GetOrderRequest;
+import ru.candle.store.orderservice.dto.response.ProductInfo;
 import ru.candle.store.orderservice.dto.response.integration.GetProductsInfoResponse;
 import ru.candle.store.orderservice.dto.response.integration.GetUserInfoResponse;
 import ru.candle.store.orderservice.dto.response.order.*;
@@ -22,10 +23,10 @@ import ru.candle.store.orderservice.service.IOrderService;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.concurrent.atomic.AtomicReference;
 
 @Service
 public class OrderServiceImpl implements IOrderService {
@@ -67,10 +68,19 @@ public class OrderServiceImpl implements IOrderService {
         return getOrderListResponse(userId);
     }
 
+    private DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+
     private AddOrderResponse addOrderResponse(AddOrderRequest rq, Long userId, String role) {
-        PromocodeEntity promocodeEntity = promocodeRepository.findByPromocode(rq.getPromocode());
-        if (promocodeEntity == null) {
-            throw new RuntimeException("Промокод не найден");
+        Long promocodePercent = null;
+        if (rq.getPromocode() != null) {
+            PromocodeEntity promocodeEntity = promocodeRepository.findByPromocode(rq.getPromocode());
+            if (promocodeEntity == null) {
+                throw new RuntimeException("Промокод не найден");
+            }
+            if (promocodeEntity.getActual().equals(false)) {
+                throw new RuntimeException("Промокод не действителен");
+            }
+            promocodePercent = promocodeEntity.getPercent();
         }
         List<Long> productIds = new ArrayList<>();
         rq.getProductsAndCounts().forEach(productAndCount -> productIds.add(productAndCount.getProductId()));
@@ -78,32 +88,45 @@ public class OrderServiceImpl implements IOrderService {
         if (productsInfo.getProductsInfo().isEmpty() || productsInfo.getProductsInfo().size() != productIds.size()) {
             throw new RuntimeException("Получена информация не обо всех продуктах");
         }
+        List<String> notActualProduct = productsInfo.getProductsInfo().stream()
+                .filter(p -> !p.getActual())
+                .map(ProductInfo::getTitle)
+                .toList();
+        if (!notActualProduct.isEmpty()) {
+            throw new RuntimeException("Часть продуктов приобрести нельзя, удалите их из корзины: " + notActualProduct);
+        }
 
         List<ProductEntity> productEntities = new ArrayList<>();
-        AtomicReference<Long> totalPrice = new AtomicReference<>(0L);
-        AtomicReference<Long> totalPromoPrice = new AtomicReference<>(0L);
-        productsInfo.getProductsInfo().forEach(productInfo -> {
+        Long totalPrice = 0L;
+        Long totalPromoPrice = 0L;
+        for (ProductInfo productInfo : productsInfo.getProductsInfo()) {
             Long count = rq.getProductsAndCounts().stream().filter(p ->
                     p.getProductId().equals(productInfo.getProductId())).findFirst().get().getCountId();
-            productEntities.add(new ProductEntity(
+            ProductEntity productEntity = new ProductEntity(
                     productInfo.getProductId(),
                     productInfo.getImageId(),
                     productInfo.getTitle(),
                     productInfo.getPrice(),
-                    productInfo.getPrice() * promocodeEntity.getPercent() / 100,
+                    null,
                     count
-            ));
-            totalPrice.updateAndGet(v -> v + productInfo.getPrice() * count);
-            totalPromoPrice.updateAndGet(v -> v + (productInfo.getPrice() * promocodeEntity.getPercent() / 100) * count);
-        });
+            );
+            totalPrice += productInfo.getPrice() * count;
+            if (promocodePercent != null) {
+                productEntity.setPromoPrice((long) (productInfo.getPrice() * (1 - promocodePercent / 100.00)));
+                totalPromoPrice += (long) (productInfo.getPrice() * (1 - promocodePercent / 100.00) * count);
+            }
+            productEntities.add(productEntity);
+        };
+        totalPromoPrice = totalPrice > 0L && totalPromoPrice == 0L ? null : totalPromoPrice;
 
         OrderEntity orderEntity = new OrderEntity(
+                null,
                 userId,
-                LocalDateTime.now(ZoneId.of("Ekaterinburg")),
+                LocalDateTime.now(ZoneId.of("UTC+5")).format(dateTimeFormatter),
                 rq.getAddress(),
                 rq.getPromocode(),
-                totalPrice.get(),
-                totalPromoPrice.get(),
+                totalPrice,
+                totalPromoPrice,
                 productEntities,
                 Status.NEW
         );
@@ -142,7 +165,7 @@ public class OrderServiceImpl implements IOrderService {
     }
 
     GetAllOrdersByStatusResponse getAllOrdersByStatusResponse(GetAllOrdersByStatusRequest rq) {
-        List<OrderEntity> orderEntities = orderRepository.findAllByStatus(rq.getStatus().name());
+        List<OrderEntity> orderEntities = orderRepository.findAllByStatus(rq.getStatus());
         if (orderEntities.isEmpty()) {
             throw new RuntimeException("Заказов в искомом статусе нет");
         }

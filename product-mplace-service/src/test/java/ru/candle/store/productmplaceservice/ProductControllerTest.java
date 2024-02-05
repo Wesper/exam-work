@@ -40,7 +40,7 @@ public class ProductControllerTest {
     private ObjectMapper objectMapper = new ObjectMapper();
 
     @Test
-    void WhenRequestGetAllProductsSuccess() throws Exception {
+    void whenRequestGetAllProductsSuccess() throws Exception {
         List<Product> products = new ArrayList<>();
         products.add(new Product(1L, "a.jpeg", "title", "subtitle", 1L, "type", 0.0));
         GetAllProductsResponse response = new GetAllProductsResponse(true, products);
@@ -52,14 +52,14 @@ public class ProductControllerTest {
     }
 
     @Test
-    void WhenRequestGetAllProductsFail() throws Exception {
+    void whenRequestGetAllProductsFail() throws Exception {
         Mockito.when(service.getAllProducts()).thenThrow(RuntimeException.class);
 
         Assertions.assertThrows(ServletException.class, () -> mockMvc.perform(MockMvcRequestBuilders.get("/product/get").contentType(MediaType.APPLICATION_JSON)));
     }
 
     @Test
-    void WhenRequestGetProductCardSuccess() throws Exception {
+    void whenRequestGetProductCardSuccess() throws Exception {
         Long userId = 1L;
         GetProductCardRequest request = new GetProductCardRequest(1L);
         GetProductCardResponse response = new GetProductCardResponse(1L, "a.jpeg", "title", "description", 1L, "measure", "unit", "type", 0.0, true, true, null);
@@ -71,7 +71,7 @@ public class ProductControllerTest {
     }
 
     @Test
-    void WhenRequestGetProductCardWithoutHeaderFail() throws Exception {
+    void whenRequestGetProductCardWithoutHeaderFail() throws Exception {
         Long userId = 1L;
         GetProductCardRequest request = new GetProductCardRequest(1L);
         GetProductCardResponse response = new GetProductCardResponse(1L, "a.jpeg", "title", "description", 1L, "measure", "unit", "type", 0.0, true, true, null);
@@ -82,7 +82,7 @@ public class ProductControllerTest {
     }
 
     @Test
-    void WhenRequestGetProductCardFail() throws Exception {
+    void whenRequestGetProductCardFail() throws Exception {
         Long userId = 1L;
         GetProductCardRequest request = new GetProductCardRequest(1L);
         Mockito.when(service.getProductCard(request, userId)).thenThrow(RuntimeException.class);
@@ -91,7 +91,7 @@ public class ProductControllerTest {
     }
 
     @Test
-    void WhenRequestAddProductSuccess() throws Exception {
+    void whenRequestAddProductSuccess() throws Exception {
         AddProductRequest request = new AddProductRequest("a.jpeg", "title", "description", "subtitle", 1L, "type", "measure", "unit", true);
         AddProductResponse response = new AddProductResponse(true);
         Mockito.when(service.addProduct(request)).thenReturn(response);
@@ -102,7 +102,7 @@ public class ProductControllerTest {
     }
 
     @Test
-    void WhenRequestAddProductWithoutHeaderFail() throws Exception {
+    void whenRequestAddProductWithoutHeaderFail() throws Exception {
         AddProductRequest request = new AddProductRequest("a.jpeg", "title", "description", "subtitle", 1L, "type", "measure", "unit", true);
         AddProductResponse response = new AddProductResponse(true);
         Mockito.when(service.addProduct(request)).thenReturn(response);
@@ -115,7 +115,7 @@ public class ProductControllerTest {
     }
 
     @Test
-    void WhenRequestAddProductFail() throws Exception {
+    void whenRequestAddProductFail() throws Exception {
         AddProductRequest request = new AddProductRequest("a.jpeg", "title", "description", "subtitle", 1L, "type", "measure", "unit", true);
         Mockito.when(service.addProduct(request)).thenThrow(RuntimeException.class);
 
@@ -123,7 +123,7 @@ public class ProductControllerTest {
     }
 
     @Test
-    void WhenRequestUpdateProductSuccess() throws Exception {
+    void whenRequestUpdateProductSuccess() throws Exception {
         UpdateProductRequest request = new UpdateProductRequest(1L, "a.jpeg", "title", "description", "subtitle", 1L, "type", "measure", "unit", true);
         UpdateProductResponse response = new UpdateProductResponse(true);
         Mockito.when(service.updateProduct(request)).thenReturn(response);
@@ -134,7 +134,7 @@ public class ProductControllerTest {
     }
 
     @Test
-    void WhenRequestUpdateProductWithoutHeaderFail() throws Exception {
+    void whenRequestUpdateProductWithoutHeaderFail() throws Exception {
         UpdateProductRequest request = new UpdateProductRequest(1L, "a.jpeg", "title", "description", "subtitle", 1L, "type", "measure", "unit", true);
         UpdateProductResponse response = new UpdateProductResponse(true);
         Mockito.when(service.updateProduct(request)).thenReturn(response);
@@ -147,7 +147,7 @@ public class ProductControllerTest {
     }
 
     @Test
-    void WhenRequestUpdateProductFail() throws Exception {
+    void whenRequestUpdateProductFail() throws Exception {
         UpdateProductRequest request = new UpdateProductRequest(1L, "a.jpeg", "title", "description", "subtitle", 1L, "type", "measure", "unit", true);
         Mockito.when(service.updateProduct(request)).thenThrow(RuntimeException.class);
 
@@ -155,7 +155,7 @@ public class ProductControllerTest {
     }
 
     @Test
-    void WhenRequestChangeProductAvailableSuccess() throws Exception {
+    void whenRequestChangeProductAvailableSuccess() throws Exception {
         ChangeProductAvailableRequest request = new ChangeProductAvailableRequest(1L, true);
         ChangeProductAvailableResponse response = new ChangeProductAvailableResponse(true);
         Mockito.when(service.changeProductAvailable(request)).thenReturn(response);
@@ -166,7 +166,7 @@ public class ProductControllerTest {
     }
 
     @Test
-    void WhenRequestChangeProductAvailableWithoutHeaderFail() throws Exception {
+    void whenRequestChangeProductAvailableWithoutHeaderFail() throws Exception {
         ChangeProductAvailableRequest request = new ChangeProductAvailableRequest(1L, true);
         ChangeProductAvailableResponse response = new ChangeProductAvailableResponse(true);
         Mockito.when(service.changeProductAvailable(request)).thenReturn(response);
@@ -179,7 +179,7 @@ public class ProductControllerTest {
     }
 
     @Test
-    void WhenRequestChangeProductAvailableFail() throws Exception {
+    void whenRequestChangeProductAvailableFail() throws Exception {
         ChangeProductAvailableRequest request = new ChangeProductAvailableRequest(1L, true);
         Mockito.when(service.changeProductAvailable(request)).thenThrow(RuntimeException.class);
 
@@ -187,7 +187,7 @@ public class ProductControllerTest {
     }
 
     @Test
-    void WhenRequestAddReviewSuccess() throws Exception {
+    void whenRequestAddReviewSuccess() throws Exception {
         Long userId = 1L;
         AddReviewRequest request = new AddReviewRequest(1L, "review");
         AddReviewResponse response = new AddReviewResponse(true);
@@ -199,7 +199,7 @@ public class ProductControllerTest {
     }
 
     @Test
-    void WhenRequestAddReviewWithoutHeaderFail() throws Exception {
+    void whenRequestAddReviewWithoutHeaderFail() throws Exception {
         Long userId = 1L;
         AddReviewRequest request = new AddReviewRequest(1L, "review");
         AddReviewResponse response = new AddReviewResponse(true);
@@ -213,7 +213,7 @@ public class ProductControllerTest {
     }
 
     @Test
-    void WhenRequestAddReviewFail() throws Exception {
+    void whenRequestAddReviewFail() throws Exception {
         Long userId = 1L;
         AddReviewRequest request = new AddReviewRequest(1L, "review");
         Mockito.when(service.addReview(request, userId)).thenThrow(RuntimeException.class);
@@ -222,7 +222,7 @@ public class ProductControllerTest {
     }
 
     @Test
-    void WhenRequestAddRatingSuccess() throws Exception {
+    void whenRequestAddRatingSuccess() throws Exception {
         Long userId = 1L;
         AddRatingRequest request = new AddRatingRequest(1L, 1L);
         AddRatingResponse response = new AddRatingResponse(true);
@@ -234,7 +234,7 @@ public class ProductControllerTest {
     }
 
     @Test
-    void WhenRequestAddRatingWithoutHeaderFail() throws Exception {
+    void whenRequestAddRatingWithoutHeaderFail() throws Exception {
         Long userId = 1L;
         AddRatingRequest request = new AddRatingRequest(1L, 1L);
         AddRatingResponse response = new AddRatingResponse(true);
@@ -248,7 +248,7 @@ public class ProductControllerTest {
     }
 
     @Test
-    void WhenRequestAddRatingFail() throws Exception {
+    void whenRequestAddRatingFail() throws Exception {
         Long userId = 1L;
         AddRatingRequest request = new AddRatingRequest(1L, 1L);
         Mockito.when(service.addRating(request, userId)).thenThrow(RuntimeException.class);

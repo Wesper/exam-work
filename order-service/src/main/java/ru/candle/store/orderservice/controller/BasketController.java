@@ -43,11 +43,10 @@ public class BasketController {
     }
 
     @PreAuthorize("#role == 'USER'")
-    @PostMapping(value = "/get")
+    @GetMapping(value = "/get")
     public GetBasketResponse getBasket(@RequestHeader("role") String role, @RequestHeader("userId") Long userId) {
         return service.getBasket(userId, role);
     }
-
 
     @PreAuthorize("#role == 'USER'")
     @PostMapping(value = "/promocode/apply")

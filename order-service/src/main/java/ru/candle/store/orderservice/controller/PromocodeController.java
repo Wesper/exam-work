@@ -8,7 +8,7 @@ import ru.candle.store.orderservice.dto.request.promocodes.AddPromocodeRequest;
 import ru.candle.store.orderservice.dto.request.promocodes.ChangePromocodeActualRequest;
 import ru.candle.store.orderservice.dto.response.promocodes.AddPromocodeResponse;
 import ru.candle.store.orderservice.dto.response.promocodes.ChangePromocodeActualResponse;
-import ru.candle.store.orderservice.dto.response.promocodes.GetAllPromocodeResponse;
+import ru.candle.store.orderservice.dto.response.promocodes.GetAllPromocodesResponse;
 import ru.candle.store.orderservice.dto.response.promocodes.GetPromocodeResponse;
 import ru.candle.store.orderservice.service.IPromocodeService;
 
@@ -27,13 +27,13 @@ public class PromocodeController {
 
     @PreAuthorize("#role == 'USER'")
     @GetMapping(value = "/get/{promocode}")
-    public GetPromocodeResponse getPromocode(@PathVariable("promocode") String promocode, @RequestHeader("role") String role, @RequestHeader("userId") Long userId) {
+    public GetPromocodeResponse getPromocode(@PathVariable("promocode") String promocode, @RequestHeader("role") String role) {
         return service.getPromocode(promocode);
     }
 
     @PreAuthorize("#role == 'ADMIN'")
     @GetMapping(value = "/get")
-    public GetAllPromocodeResponse getAllPromocodes(@RequestHeader("role") String role) {
+    public GetAllPromocodesResponse getAllPromocodes(@RequestHeader("role") String role) {
         return service.getAllPromocodes();
     }
 

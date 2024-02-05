@@ -15,7 +15,6 @@ import java.util.List;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@RequiredArgsConstructor
 @DynamicUpdate
 public class OrderEntity {
 
@@ -29,14 +28,13 @@ public class OrderEntity {
 
     @Column(name = "date")
     @NonNull
-    private LocalDateTime date;
+    private String date;
 
     @Column(name = "address")
     @NonNull
     private String address;
 
     @Column(name = "promocode")
-    @NonNull
     private String promocode;
 
     @Column(name = "total_price")
@@ -44,7 +42,6 @@ public class OrderEntity {
     private Long totalPrice;
 
     @Column(name = "total_promo_price")
-    @NonNull
     private Long total_promo_price;
 
     @Column(name = "details")

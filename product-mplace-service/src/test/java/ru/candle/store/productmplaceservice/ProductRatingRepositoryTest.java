@@ -22,7 +22,7 @@ public class ProductRatingRepositoryTest {
     private ProductRatingRepository ratingRepository;
 
     @Test
-    void WhenFindAllInWithEntities() {
+    void whenFindAllInWithEntities() {
         List<ProductRatingEntity> s = ratingRepository.findAll();
         List<ProductRatingEntity> expRatings = new ArrayList<>();
         expRatings.add(new ProductRatingEntity(9l, 5L, 5L, 5L));
@@ -31,14 +31,14 @@ public class ProductRatingRepositoryTest {
     }
 
     @Test
-    void WhenFindAllInWithoutEntities() {
+    void whenFindAllInWithoutEntities() {
         List<ProductRatingEntity> expRatings = new ArrayList<>();
         List<ProductRatingEntity> actRatings = ratingRepository.findAllIn(Arrays.asList(10L, 20L));
         Assertions.assertEquals(expRatings, actRatings);
     }
 
     @Test
-    void WhenGetAvgRatingInGroupByProductWithEntities() {
+    void whenGetAvgRatingInGroupByProductWithEntities() {
         List<AvgRatingByProductImpl> expRatings = new ArrayList<>();
         expRatings.add(new AvgRatingByProductImpl(2.25, 1L));
         expRatings.add(new AvgRatingByProductImpl(3.0, 2L));
@@ -52,35 +52,35 @@ public class ProductRatingRepositoryTest {
     }
 
     @Test
-    void WhenGetAvgRatingInGroupByProductWithoutEntities() {
+    void whenGetAvgRatingInGroupByProductWithoutEntities() {
         List<AvgRatingByProductImpl> expRatings = new ArrayList<>();
         List<IAvgRatingByProduct> actRatings = ratingRepository.getAvgRatingInGroupByProduct(Arrays.asList(10L, 20L));
         Assertions.assertEquals(expRatings, actRatings);
     }
 
     @Test
-    void WhenFindByUserIdWithEntities() {
+    void whenFindByUserIdWithEntities() {
         Integer expRatings = 1;
         int actRatings = ratingRepository.findByUserIdAndProductId(1L, 1L);
         Assertions.assertEquals(expRatings, actRatings);
     }
 
     @Test
-    void WhenFindByUserIdWithoutEntities() {
+    void whenFindByUserIdWithoutEntities() {
         Integer expRatings = 0;
         int actRatings = ratingRepository.findByUserIdAndProductId(1L, 10L);
         Assertions.assertEquals(expRatings, actRatings);
     }
 
     @Test
-    void WhenGetAvgRatingByProductWithEntities() {
+    void whenGetAvgRatingByProductWithEntities() {
         Double expRatings = 4.5;
         Double actRatings = ratingRepository.getAvgRatingByProduct(3L);
         Assertions.assertEquals(expRatings, actRatings);
     }
 
     @Test
-    void WhenGetAvgRatingByProductWithoutEntities() {
+    void whenGetAvgRatingByProductWithoutEntities() {
         Double expRatings = null;
         Double actRatings = ratingRepository.getAvgRatingByProduct(30L);
         Assertions.assertEquals(expRatings, actRatings);

@@ -9,26 +9,18 @@ import org.hibernate.annotations.DynamicUpdate;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@RequiredArgsConstructor
-@DynamicUpdate
 public class ProductEntity {
 
     @Id
-    @NonNull
     private Long productId;
 
-    @NonNull
     private String imageId;
 
-    @NonNull
     private String title;
 
-    @NonNull
     private Long price;
 
-    @NonNull
     private Long promoPrice;
 
-    @NonNull
     private Long count;
 }

@@ -17,5 +17,5 @@ public class AddPromocodeRequest {
     @NonNull
     private Long percent;
     @NonNull
-    private boolean actual;
+    private Boolean actual;
 }
