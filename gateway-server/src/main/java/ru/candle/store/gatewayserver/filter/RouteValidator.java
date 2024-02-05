@@ -13,7 +13,9 @@ public class RouteValidator {
             "/auth/signIn",
             "/auth/signUp",
             "/auth/validate",
-            "/auth/token/info/get"
+            "/auth/token/info/get",
+            "/product/get",
+            "/product/card"
     );
 
     public Predicate<ServerHttpRequest> isSecured = request -> openApiEndpoints.stream().noneMatch(uri -> request.getURI().getPath().contains(uri));

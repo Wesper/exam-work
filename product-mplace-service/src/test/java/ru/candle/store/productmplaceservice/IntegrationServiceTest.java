@@ -22,7 +22,7 @@ public class IntegrationServiceTest {
     IntegrationServiceImpl integrationService;
 
     @Test
-    void WherIsUserPurchasedProductReturnTrue() {
+    void wherIsUserPurchasedProductReturnTrue() {
         IsUserPurchasedProductRequest request = new IsUserPurchasedProductRequest(1L, 1L);
         Mockito.when(restTemplate.postForObject("http://order-service/order/isPurchase", request, IsUserPurchasedProductResponse.class)).thenReturn(new IsUserPurchasedProductResponse(true));
 
@@ -31,7 +31,7 @@ public class IntegrationServiceTest {
     }
 
     @Test
-    void WherIsUserPurchasedProductReturnFalse() {
+    void wherIsUserPurchasedProductReturnFalse() {
         IsUserPurchasedProductRequest request = new IsUserPurchasedProductRequest(1L, 1L);
         Mockito.when(restTemplate.postForObject("http://order-service/order/isPurchase", request, IsUserPurchasedProductResponse.class)).thenReturn(new IsUserPurchasedProductResponse(false));
 
@@ -40,7 +40,7 @@ public class IntegrationServiceTest {
     }
 
     @Test
-    void WherIsUserPurchasedProductReturnNull() {
+    void wherIsUserPurchasedProductReturnNull() {
         IsUserPurchasedProductRequest request = new IsUserPurchasedProductRequest(1L, 1L);
         Mockito.when(restTemplate.postForObject("http://order-service/order/isPurchase", request, IsUserPurchasedProductResponse.class)).thenReturn(null);
 

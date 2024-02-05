@@ -12,4 +12,5 @@ public interface IProductService {
     ChangeProductAvailableResponse changeProductAvailable(ChangeProductAvailableRequest rq);
     AddReviewResponse addReview(AddReviewRequest rq, Long userId);
     AddRatingResponse addRating(AddRatingRequest rq, Long userId);
+    GetProductsInfoResponse getProductInfoByIds(GetProductsInfoRequest rq);
 }

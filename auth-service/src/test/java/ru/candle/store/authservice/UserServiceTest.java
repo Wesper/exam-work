@@ -23,7 +23,7 @@ public class UserServiceTest {
     private UserService service;
 
     @Test
-    void createUserWhenItNotExist() {
+    void whenCreateUserWhenItNotExist() {
         UserEntity expectedUser = new UserEntity(
                 "One",
                 "OnePass",
@@ -43,7 +43,7 @@ public class UserServiceTest {
     }
 
     @Test
-    void createUserWhenUsernameAlreadyExist() {
+    void whenCreateUserWhenUsernameAlreadyExist() {
         UserEntity user = new UserEntity(
                 "One",
                 "OnePass",
@@ -57,7 +57,7 @@ public class UserServiceTest {
     }
 
     @Test
-    void createUserWhenEmailAlreadyExist() {
+    void whenCreateUserWhenEmailAlreadyExist() {
         UserEntity user = new UserEntity(
                 "One",
                 "OnePass",
@@ -71,14 +71,14 @@ public class UserServiceTest {
     }
 
     @Test
-    void changeUserPasswordSuccess() {
+    void whenChangeUserPasswordSuccess() {
         Mockito.when(repository.updatePasswordByUsername(Mockito.any(), Mockito.any())).thenReturn(1);
 
         Assertions.assertTrue(service.changePassword("pass", "login"));
     }
 
     @Test
-    void changeUserPasswordFail() {
+    void whenChangeUserPasswordFail() {
         Mockito.when(repository.updatePasswordByUsername(Mockito.any(), Mockito.any())).thenReturn(0);
 
         Assertions.assertThrows(RuntimeException.class, () -> service.changePassword("pass", "login"));

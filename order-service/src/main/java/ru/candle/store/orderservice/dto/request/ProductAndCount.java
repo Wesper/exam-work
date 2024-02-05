@@ -1,4 +1,4 @@
-package ru.candle.store.productmplaceservice.dto.response;
+package ru.candle.store.orderservice.dto.request;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -9,8 +9,8 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class Review {
+public class ProductAndCount {
 
-    private Long userId;
-    private String review;
+    private Long productId;
+    private Long countId;
 }
