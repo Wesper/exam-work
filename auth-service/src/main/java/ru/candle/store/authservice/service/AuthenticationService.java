@@ -40,7 +40,7 @@ public class AuthenticationService {
                 Role.ROLE_USER
         );
 
-        userService.create(user);
+        user = userService.create(user);
 
         String jwt = jwtService.generateToken(user);
         return new JwtAuthenticationResponse(jwt);

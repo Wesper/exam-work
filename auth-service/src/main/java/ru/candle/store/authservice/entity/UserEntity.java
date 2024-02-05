@@ -41,6 +41,14 @@ public class UserEntity implements UserDetails {
     @NonNull
     private Role role;
 
+    public UserEntity(@NonNull Long id, @NonNull String username, @NonNull String password, @NonNull String email, @NonNull Role role) {
+        this.id = id;
+        this.username = username;
+        this.password = password;
+        this.email = email;
+        this.role = role;
+    }
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return List.of(new SimpleGrantedAuthority(role.name()));
