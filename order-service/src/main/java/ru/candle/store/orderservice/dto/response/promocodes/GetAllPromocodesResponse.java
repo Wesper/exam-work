@@ -14,5 +14,8 @@ import java.util.List;
 @Builder
 public class GetAllPromocodesResponse {
 
+    private Boolean success;
     private List<Promocode> promocodes;
+    private String errorCode;
+    private String errorText;
 }

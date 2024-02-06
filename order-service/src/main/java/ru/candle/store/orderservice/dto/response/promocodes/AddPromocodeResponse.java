@@ -11,5 +11,7 @@ import lombok.NoArgsConstructor;
 @Builder
 public class AddPromocodeResponse {
 
-    private boolean success;
+    private Boolean success;
+    private String errorCode;
+    private String errorText;
 }

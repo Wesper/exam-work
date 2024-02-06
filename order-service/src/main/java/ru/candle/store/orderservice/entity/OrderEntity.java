@@ -4,10 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.DynamicUpdate;
 import ru.candle.store.orderservice.dictionary.Status;
-import ru.candle.store.orderservice.dto.Product;
 
-import java.time.LocalDateTime;
-import java.util.Date;
 import java.util.List;
 
 @Entity
@@ -42,7 +39,7 @@ public class OrderEntity {
     private Long totalPrice;
 
     @Column(name = "total_promo_price")
-    private Long total_promo_price;
+    private Long totalPromoPrice;
 
     @Column(name = "details")
     @OneToMany

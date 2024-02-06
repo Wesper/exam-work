@@ -12,5 +12,6 @@ public class ChangeOrderStatusRequest {
 
     @NonNull
     private Long orderId;
+    @NonNull
     private Status status;
 }

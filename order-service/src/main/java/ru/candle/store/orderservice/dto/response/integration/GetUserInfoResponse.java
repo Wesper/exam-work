@@ -11,10 +11,13 @@ import lombok.NoArgsConstructor;
 @Builder
 public class GetUserInfoResponse {
 
+    private Boolean success;
     private String firstName;
     private String lastName;
     private String middleName;
     private String city;
     private String birthday;
     private String address;
+    private String errorCode;
+    private String errorText;
 }

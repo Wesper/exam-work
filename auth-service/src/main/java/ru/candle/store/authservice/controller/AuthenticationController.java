@@ -44,7 +44,4 @@ public class AuthenticationController {
     public ChangePasswordResponse changePassword(@RequestBody @Valid ChangePasswordRequest rq) {
         return authenticationService.changePassword(rq);
     }
-
-    //TODO: Добавить работу с ошибками и исключениями
-
 }

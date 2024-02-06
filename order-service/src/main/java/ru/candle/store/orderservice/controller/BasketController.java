@@ -18,36 +18,76 @@ public class BasketController {
     @Autowired
     private IBasketService service;
 
+    /**
+     * Добавление продукта в корзину
+     * @param rq запрос
+     * @param role роль пользователя
+     * @param userId идентификатор пользователя
+     * @return true или false
+     */
     @PreAuthorize("#role == 'USER'")
     @PostMapping(value = "/add")
     public AddProductResponse addProduct(@RequestBody @Valid AddProductRequest rq, @RequestHeader("role") String role, @RequestHeader("userId") Long userId) {
         return service.addProduct(rq, userId, role);
     }
 
+    /**
+     * Удаление продукта из корзины
+     * @param rq запрос
+     * @param role роль пользователя
+     * @param userId идентификатор пользователя
+     * @return true или false
+     */
     @PreAuthorize("#role == 'USER'")
     @PostMapping(value = "/delete")
     public DeleteProductResponse deleteProduct(@RequestBody @Valid DeleteProductRequest rq, @RequestHeader("role") String role, @RequestHeader("userId") Long userId) {
         return service.deleteProduct(rq, userId);
     }
 
+    /**
+     * Изменение количества позиций продукта в корзине
+     * @param rq запрос
+     * @param role роль пользователя
+     * @param userId идентификатор пользователя
+     * @return true или false
+     */
     @PreAuthorize("#role == 'USER'")
     @PostMapping(value = "/product/count/change")
     public ChangeCountProductResponse changeCountProduct(@RequestBody @Valid ChangeCountProductRequest rq, @RequestHeader("role") String role, @RequestHeader("userId") Long userId) {
         return service.changeCountProduct(rq, userId);
     }
 
+    /**
+     * Удаление всех продуктов из корзины
+     * @param role роль пользователя
+     * @param userId идентификатор пользователя
+     * @return true или false
+     */
     @PreAuthorize("#role == 'USER'")
     @PostMapping(value = "/clear")
     public DeleteAllProductResponse deleteAllProduct(@RequestHeader("role") String role, @RequestHeader("userId") Long userId) {
         return service.deleteAllProduct(userId);
     }
 
+    /**
+     * Получение продуктов в корзине
+     * @param role роль пользователя
+     * @param userId идентификатор пользователя
+     * @return список продуктов
+     */
     @PreAuthorize("#role == 'USER'")
     @GetMapping(value = "/get")
     public GetBasketResponse getBasket(@RequestHeader("role") String role, @RequestHeader("userId") Long userId) {
         return service.getBasket(userId, role);
     }
 
+    /**
+     * Применение промокода для товаров корзины
+     * @param rq запрос
+     * @param role роль пользователя
+     * @param userId идентификатор пользователя
+     * @return список продуктов с учетом промокода
+     */
     @PreAuthorize("#role == 'USER'")
     @PostMapping(value = "/promocode/apply")
     public ApplyPromocodeResponse applyPromocode(@RequestBody @Valid ApplyPromocodeRequest rq, @RequestHeader("role") String role, @RequestHeader("userId") Long userId) {

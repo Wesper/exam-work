@@ -5,10 +5,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import ru.candle.store.orderservice.dictionary.Status;
-import ru.candle.store.orderservice.dto.Product;
 import ru.candle.store.orderservice.entity.ProductEntity;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 @Data
@@ -17,6 +15,7 @@ import java.util.List;
 @Builder
 public class GetOrderResponse {
 
+    private Boolean success;
     private String firstName;
     private String lastName;
     private String address;
@@ -26,5 +25,6 @@ public class GetOrderResponse {
     private Long totalPromoPrice;
     private List<ProductEntity> products;
     private Status status;
-
+    private String errorCode;
+    private String errorText;
 }

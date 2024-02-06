@@ -14,7 +14,9 @@ import java.util.List;
 @Builder
 public class GetBasketResponse {
 
+    private Boolean success;
     private List<Product> products;
     private Long totalPrice;
-
+    private String errorCode;
+    private String errorText;
 }

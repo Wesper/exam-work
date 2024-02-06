@@ -9,6 +9,9 @@ import java.util.function.Predicate;
 @Component
 public class RouteValidator {
 
+    /**
+     * URI, для которых не нужна авторизация
+     */
     public static final List<String> openApiEndpoints = List.of(
             "/auth/signIn",
             "/auth/signUp",
@@ -18,5 +21,8 @@ public class RouteValidator {
             "/product/card"
     );
 
+    /**
+     * Проверка на необходимость авторизации
+     */
     public Predicate<ServerHttpRequest> isSecured = request -> openApiEndpoints.stream().noneMatch(uri -> request.getURI().getPath().contains(uri));
 }

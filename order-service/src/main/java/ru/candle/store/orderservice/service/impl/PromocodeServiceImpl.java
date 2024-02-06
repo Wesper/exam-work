@@ -1,7 +1,9 @@
 package ru.candle.store.orderservice.service.impl;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import ru.candle.store.orderservice.dictionary.ExceptionCode;
 import ru.candle.store.orderservice.dto.request.promocodes.AddPromocodeRequest;
 import ru.candle.store.orderservice.dto.request.promocodes.ChangePromocodeActualRequest;
 import ru.candle.store.orderservice.dto.response.Promocode;
@@ -10,12 +12,14 @@ import ru.candle.store.orderservice.dto.response.promocodes.ChangePromocodeActua
 import ru.candle.store.orderservice.dto.response.promocodes.GetAllPromocodesResponse;
 import ru.candle.store.orderservice.dto.response.promocodes.GetPromocodeResponse;
 import ru.candle.store.orderservice.entity.PromocodeEntity;
+import ru.candle.store.orderservice.exception.OrderException;
 import ru.candle.store.orderservice.repository.PromocodeRepository;
 import ru.candle.store.orderservice.service.IPromocodeService;
 
 import java.util.ArrayList;
 import java.util.List;
 
+@Slf4j
 @Service
 public class PromocodeServiceImpl implements IPromocodeService {
 
@@ -24,52 +28,112 @@ public class PromocodeServiceImpl implements IPromocodeService {
 
     @Override
     public AddPromocodeResponse addPromocode(AddPromocodeRequest rq) {
-        return addPromocodeResponse(rq);
+        try {
+            return addPromocodeResponse(rq);
+        } catch (Exception e) {
+            log.error(e.getMessage());
+            return AddPromocodeResponse.builder()
+                    .success(false)
+                    .errorCode(ExceptionCode.UNKNOWN_EXCEPTION.getErrorCode())
+                    .errorText(ExceptionCode.UNKNOWN_EXCEPTION.getErrorText())
+                    .build();
+        }
     }
 
     @Override
     public GetPromocodeResponse getPromocode(String promocode) {
-        return getPromocodeResponse(promocode);
+        try {
+            return getPromocodeResponse(promocode);
+        } catch (OrderException e) {
+            log.error(e.getMessage());
+            return GetPromocodeResponse.builder()
+                    .success(false)
+                    .errorCode(e.getE().getErrorCode())
+                    .errorText(e.getE().getErrorText())
+                    .build();
+        } catch (Exception e) {
+            log.error(e.getMessage());
+            return GetPromocodeResponse.builder()
+                    .success(false)
+                    .errorCode(ExceptionCode.UNKNOWN_EXCEPTION.getErrorCode())
+                    .errorText(ExceptionCode.UNKNOWN_EXCEPTION.getErrorText())
+                    .build();
+        }
     }
 
     @Override
     public ChangePromocodeActualResponse changePromocodeActual(ChangePromocodeActualRequest rq) {
-        return changePromocodeActualResponse(rq);
+        try {
+            return changePromocodeActualResponse(rq);
+        } catch (OrderException e) {
+            log.error(e.getMessage());
+            return ChangePromocodeActualResponse.builder()
+                    .success(false)
+                    .errorCode(e.getE().getErrorCode())
+                    .errorText(e.getE().getErrorText())
+                    .build();
+        } catch (Exception e) {
+            log.error(e.getMessage());
+            return ChangePromocodeActualResponse.builder()
+                    .success(false)
+                    .errorCode(ExceptionCode.UNKNOWN_EXCEPTION.getErrorCode())
+                    .errorText(ExceptionCode.UNKNOWN_EXCEPTION.getErrorText())
+                    .build();
+        }
     }
 
     @Override
     public GetAllPromocodesResponse getAllPromocodes() {
-        return getAllPromocodesResponse();
+        try {
+            return getAllPromocodesResponse();
+        } catch (OrderException e) {
+            log.warn(e.getMessage());
+            return GetAllPromocodesResponse.builder()
+                    .success(true)
+                    .promocodes(new ArrayList<>())
+                    .build();
+        } catch (Exception e) {
+            log.error(e.getMessage());
+            return GetAllPromocodesResponse.builder()
+                    .success(false)
+                    .errorCode(ExceptionCode.UNKNOWN_EXCEPTION.getErrorCode())
+                    .errorText(ExceptionCode.UNKNOWN_EXCEPTION.getErrorText())
+                    .build();
+        }
     }
 
     private AddPromocodeResponse addPromocodeResponse(AddPromocodeRequest rq) {
         PromocodeEntity promocodeEntity = new PromocodeEntity(rq.getPromocode(), rq.getPercent(), rq.getActual());
         promocodeRepository.save(promocodeEntity);
-        return new AddPromocodeResponse(true);
+        return AddPromocodeResponse.builder().success(true).build();
     }
 
-    private GetPromocodeResponse getPromocodeResponse(String promocode) {
+    private GetPromocodeResponse getPromocodeResponse(String promocode) throws OrderException {
         PromocodeEntity promocodeEntity = promocodeRepository.findByPromocode(promocode);
         if (promocodeEntity == null) {
-            throw new RuntimeException("Промокода не существует");
+            throw new OrderException(ExceptionCode.PROMOCODE_NOT_FOUND, "Промокода не существует");
         }
-        return new GetPromocodeResponse(promocodeEntity.getPromocode(), promocodeEntity.getPercent());
+        return GetPromocodeResponse.builder()
+                .success(true)
+                .promocode(promocodeEntity.getPromocode())
+                .percent(promocodeEntity.getPercent())
+                .build();
     }
 
-    private ChangePromocodeActualResponse changePromocodeActualResponse(ChangePromocodeActualRequest rq) {
+    private ChangePromocodeActualResponse changePromocodeActualResponse(ChangePromocodeActualRequest rq) throws OrderException {
         PromocodeEntity promocodeEntity = promocodeRepository.findByPromocode(rq.getPromocode());
         if (promocodeEntity == null) {
-            throw new RuntimeException("Промокода не существует");
+            throw new OrderException(ExceptionCode.PROMOCODE_NOT_FOUND, "Промокода не существует");
         }
         promocodeEntity.setActual(rq.isActual());
         promocodeRepository.save(promocodeEntity);
-        return new ChangePromocodeActualResponse(true);
+        return ChangePromocodeActualResponse.builder().success(true).build();
     }
 
-    private GetAllPromocodesResponse getAllPromocodesResponse() {
+    private GetAllPromocodesResponse getAllPromocodesResponse() throws OrderException {
         List<PromocodeEntity> promocodeEntities = promocodeRepository.findAll();
         if (promocodeEntities.isEmpty()) {
-            throw new RuntimeException("Промокодов нет");
+            throw new OrderException(ExceptionCode.PROMOCODE_LIST_IS_EMPTY, "Промокодов нет");
         }
         List<Promocode> promocodes = new ArrayList<>();
         promocodeEntities.forEach(p -> {
@@ -79,6 +143,6 @@ public class PromocodeServiceImpl implements IPromocodeService {
                     p.getActual()
             ));
         });
-        return new GetAllPromocodesResponse(promocodes);
+        return GetAllPromocodesResponse.builder().success(true).promocodes(promocodes).build();
     }
 }

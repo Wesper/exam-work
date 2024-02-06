@@ -19,24 +19,47 @@ public class PromocodeController {
     @Autowired
     private IPromocodeService service;
 
+    /**
+     * Добавление промокода
+     * @param rq запрос
+     * @param role роль пользователя
+     * @return true или false
+     */
     @PreAuthorize("#role == 'ADMIN'")
     @PostMapping(value = "/add")
     public AddPromocodeResponse addPromocode(@RequestBody @Valid AddPromocodeRequest rq, @RequestHeader("role") String role) {
         return service.addPromocode(rq);
     }
 
+    /**
+     * Получение информации о промокоде
+     * @param promocode промокод
+     * @param role роль пользователя
+     * @return информация о промокоде
+     */
     @PreAuthorize("#role == 'USER'")
     @GetMapping(value = "/get/{promocode}")
     public GetPromocodeResponse getPromocode(@PathVariable("promocode") String promocode, @RequestHeader("role") String role) {
         return service.getPromocode(promocode);
     }
 
+    /**
+     * Получение списка промокодов
+     * @param role роль пользователя
+     * @return список промокодов
+     */
     @PreAuthorize("#role == 'ADMIN'")
     @GetMapping(value = "/get")
     public GetAllPromocodesResponse getAllPromocodes(@RequestHeader("role") String role) {
         return service.getAllPromocodes();
     }
 
+    /**
+     * Изменение статуса промокода
+     * @param rq запрос
+     * @param role роль пользователя
+     * @return true или false
+     */
     @PreAuthorize("#role == 'ADMIN'")
     @PostMapping(value = "/actual/change")
     public ChangePromocodeActualResponse changePromocodeActual(@RequestBody @Valid ChangePromocodeActualRequest rq, @RequestHeader("role") String role) {

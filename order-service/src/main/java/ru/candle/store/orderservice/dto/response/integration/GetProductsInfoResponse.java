@@ -14,5 +14,8 @@ import java.util.List;
 @Builder
 public class GetProductsInfoResponse {
 
+    private Boolean success;
     private List<ProductInfo> productsInfo;
+    private String errorCode;
+    private String errorText;
 }
