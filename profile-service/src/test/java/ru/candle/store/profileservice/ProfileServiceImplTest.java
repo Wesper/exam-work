@@ -7,6 +7,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+import ru.candle.store.profileservice.dictionary.ExceptionCode;
 import ru.candle.store.profileservice.dto.request.SaveProfileRequest;
 import ru.candle.store.profileservice.dto.response.GetProfileResponse;
 import ru.candle.store.profileservice.dto.response.SaveProfileResponse;
@@ -27,9 +28,27 @@ public class ProfileServiceImplTest {
 
     @Test
     void whenGetProfileNotFound() {
-        Mockito.when(repository.findById(1L)).thenReturn(null);
+        Mockito.when(repository.findById(1L)).thenReturn(Optional.ofNullable(null));
+        GetProfileResponse expResponse = GetProfileResponse.builder()
+                .success(true)
+                .build();
 
-        Assertions.assertThrows(RuntimeException.class, () -> service.getUserProfile(1L));
+        GetProfileResponse response = service.getUserProfile(1L);
+        Assertions.assertEquals(expResponse, response);
+        Mockito.verify(repository, Mockito.times(1)).findById(1L);
+    }
+
+    @Test
+    void whenGetProfileFail() {
+        Mockito.when(repository.findById(1L)).thenThrow(IllegalArgumentException.class);
+        GetProfileResponse expResponse = GetProfileResponse.builder()
+                .success(false)
+                .errorCode(ExceptionCode.UNKNOWN_EXCEPTION.getErrorCode())
+                .errorText(ExceptionCode.UNKNOWN_EXCEPTION.getErrorText())
+                .build();
+
+        GetProfileResponse response = service.getUserProfile(1L);
+        Assertions.assertEquals(expResponse, response);
         Mockito.verify(repository, Mockito.times(1)).findById(1L);
     }
 
@@ -37,7 +56,15 @@ public class ProfileServiceImplTest {
     void whenGetProfileFound() {
         ProfileEntity profile = new ProfileEntity(1L, "First", "Last", "Middle", "City", "1990-01-01", "Address");
         Mockito.when(repository.findById(1L)).thenReturn(Optional.of(profile));
-        GetProfileResponse expResponse = new GetProfileResponse("First", "Last", "Middle", "City", "1990-01-01", "Address");
+        GetProfileResponse expResponse = GetProfileResponse.builder()
+                .success(true)
+                .firstName("First")
+                .lastName("Last")
+                .middleName("Middle")
+                .city("City")
+                .birthday("1990-01-01")
+                .address("Address")
+                .build();
 
         GetProfileResponse response = service.getUserProfile(1L);
         Assertions.assertEquals(expResponse, response);
@@ -49,7 +76,9 @@ public class ProfileServiceImplTest {
         ProfileEntity profile = new ProfileEntity(1L, "First", "Last", "Middle", "City", "1990-01-01", "Address");
         Mockito.when(repository.save(profile)).thenReturn(profile);
         SaveProfileRequest request = new SaveProfileRequest("First", "Last", "Middle", "City", "1990-01-01", "Address");
-        SaveProfileResponse expResponse = new SaveProfileResponse(true);
+        SaveProfileResponse expResponse = SaveProfileResponse.builder()
+                .success(true)
+                .build();
 
         SaveProfileResponse response = service.saveUserProfile(request, 1L);
         Assertions.assertEquals(expResponse, response);
@@ -59,10 +88,16 @@ public class ProfileServiceImplTest {
     @Test
     void whenSaveProfileFail() {
         ProfileEntity profile = new ProfileEntity(1L, "First", "Last", "Middle", "City", "1990-01-01", "Address");
-        Mockito.when(repository.save(profile)).thenThrow(RuntimeException.class);
+        Mockito.when(repository.save(profile)).thenThrow(IllegalArgumentException.class);
         SaveProfileRequest request = new SaveProfileRequest("First", "Last", "Middle", "City", "1990-01-01", "Address");
+        SaveProfileResponse expResponse = SaveProfileResponse.builder()
+                .success(false)
+                .errorCode(ExceptionCode.UNKNOWN_EXCEPTION.getErrorCode())
+                .errorText(ExceptionCode.UNKNOWN_EXCEPTION.getErrorText())
+                .build();
 
-        Assertions.assertThrows(RuntimeException.class, () -> service.saveUserProfile(request, 1L));
+        SaveProfileResponse response = service.saveUserProfile(request, 1L);
+        Assertions.assertEquals(expResponse, response);
         Mockito.verify(repository, Mockito.times(1)).save(profile);
     }
 }

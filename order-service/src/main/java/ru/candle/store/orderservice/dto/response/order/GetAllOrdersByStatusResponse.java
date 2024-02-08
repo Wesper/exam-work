@@ -14,5 +14,8 @@ import java.util.List;
 @Builder
 public class GetAllOrdersByStatusResponse {
 
+    private Boolean success;
     private List<Order> orders;
+    private String errorCode;
+    private String errorText;
 }

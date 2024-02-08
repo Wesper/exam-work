@@ -4,11 +4,8 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import ru.candle.store.orderservice.dictionary.Status;
 import ru.candle.store.orderservice.dto.Order;
-import ru.candle.store.orderservice.dto.Product;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 @Data
@@ -17,5 +14,8 @@ import java.util.List;
 @Builder
 public class GetOrderListResponse {
 
+    private Boolean success;
     private List<Order> orders;
+    private String errorCode;
+    private String errorText;
 }

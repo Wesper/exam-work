@@ -1,7 +1,9 @@
 package ru.candle.store.orderservice.service.impl;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import ru.candle.store.orderservice.dictionary.ExceptionCode;
 import ru.candle.store.orderservice.dto.Product;
 import ru.candle.store.orderservice.dto.request.basket.AddProductRequest;
 import ru.candle.store.orderservice.dto.request.basket.ApplyPromocodeRequest;
@@ -12,6 +14,7 @@ import ru.candle.store.orderservice.dto.response.basket.*;
 import ru.candle.store.orderservice.dto.response.integration.GetProductsInfoResponse;
 import ru.candle.store.orderservice.entity.BasketEntity;
 import ru.candle.store.orderservice.entity.PromocodeEntity;
+import ru.candle.store.orderservice.exception.OrderException;
 import ru.candle.store.orderservice.repository.BasketRepository;
 import ru.candle.store.orderservice.repository.PromocodeRepository;
 import ru.candle.store.orderservice.service.IBasketService;
@@ -21,6 +24,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 
+@Slf4j
 @Service
 public class BasketServiceImpl implements IBasketService {
 
@@ -35,35 +39,124 @@ public class BasketServiceImpl implements IBasketService {
 
     @Override
     public AddProductResponse addProduct(AddProductRequest rq, Long userId, String role) {
-        return addProductResponse(rq, userId, role);
+        try {
+            return addProductResponse(rq, userId, role);
+        } catch (OrderException e) {
+            log.error(e.getMessage());
+            return AddProductResponse.builder()
+                    .success(false)
+                    .errorCode(e.getE().getErrorCode())
+                    .errorText(e.getE().getErrorText())
+                    .build();
+        } catch (Exception e) {
+            log.error(e.getMessage());
+            return AddProductResponse.builder()
+                    .success(false)
+                    .errorCode(ExceptionCode.UNKNOWN_EXCEPTION.getErrorCode())
+                    .errorText(ExceptionCode.UNKNOWN_EXCEPTION.getErrorCode())
+                    .build();
+        }
     }
 
     @Override
     public DeleteProductResponse deleteProduct(DeleteProductRequest rq, Long userId) {
-        return deleteProductResponse(rq, userId);
+        try {
+            return deleteProductResponse(rq, userId);
+        } catch (OrderException e) {
+            log.error(e.getMessage());
+            return DeleteProductResponse.builder()
+                    .success(false)
+                    .errorCode(e.getE().getErrorCode())
+                    .errorText(e.getE().getErrorText())
+                    .build();
+        } catch (Exception e) {
+            log.error(e.getMessage());
+            return DeleteProductResponse.builder()
+                    .success(false)
+                    .errorCode(ExceptionCode.UNKNOWN_EXCEPTION.getErrorCode())
+                    .errorText(ExceptionCode.UNKNOWN_EXCEPTION.getErrorCode())
+                    .build();
+        }
     }
 
     @Override
     public ChangeCountProductResponse changeCountProduct(ChangeCountProductRequest rq, Long userId) {
-        return changeCountProductResponse(rq, userId);
+        try {
+            return changeCountProductResponse(rq, userId);
+        } catch (OrderException e) {
+            log.error(e.getMessage());
+            return ChangeCountProductResponse.builder()
+                    .success(false)
+                    .errorCode(e.getE().getErrorCode())
+                    .errorText(e.getE().getErrorText())
+                    .build();
+        } catch (Exception e) {
+            log.error(e.getMessage());
+            return ChangeCountProductResponse.builder()
+                    .success(false)
+                    .errorCode(ExceptionCode.UNKNOWN_EXCEPTION.getErrorCode())
+                    .errorText(ExceptionCode.UNKNOWN_EXCEPTION.getErrorCode())
+                    .build();
+        }
     }
 
     @Override
     public DeleteAllProductResponse deleteAllProduct(Long userId) {
-        return deleteAllProductResponse(userId);
+        try {
+            return deleteAllProductResponse(userId);
+        } catch (Exception e) {
+            log.error(e.getMessage());
+            return DeleteAllProductResponse.builder()
+                    .success(false)
+                    .errorCode(ExceptionCode.UNKNOWN_EXCEPTION.getErrorCode())
+                    .errorText(ExceptionCode.UNKNOWN_EXCEPTION.getErrorCode())
+                    .build();
+        }
     }
 
     @Override
     public GetBasketResponse getBasket(Long userId, String role) {
-        return getBasketResponse(userId, role);
+        try {
+            return getBasketResponse(userId, role);
+        } catch (OrderException e) {
+            log.error(e.getMessage());
+            return GetBasketResponse.builder()
+                    .success(false)
+                    .errorCode(e.getE().getErrorCode())
+                    .errorText(e.getE().getErrorText())
+                    .build();
+        } catch (Exception e) {
+            log.error(e.getMessage());
+            return GetBasketResponse.builder()
+                    .success(false)
+                    .errorCode(ExceptionCode.UNKNOWN_EXCEPTION.getErrorCode())
+                    .errorText(ExceptionCode.UNKNOWN_EXCEPTION.getErrorCode())
+                    .build();
+        }
     }
 
     @Override
     public ApplyPromocodeResponse applyPromocode(ApplyPromocodeRequest rq, Long userId, String role) {
-        return applyPromocodeResponse(rq, userId, role);
+        try {
+            return applyPromocodeResponse(rq, userId, role);
+        } catch (OrderException e) {
+            log.error(e.getMessage());
+            return ApplyPromocodeResponse.builder()
+                    .success(false)
+                    .errorCode(e.getE().getErrorCode())
+                    .errorText(e.getE().getErrorText())
+                    .build();
+        } catch (Exception e) {
+            log.error(e.getMessage());
+            return ApplyPromocodeResponse.builder()
+                    .success(false)
+                    .errorCode(ExceptionCode.UNKNOWN_EXCEPTION.getErrorCode())
+                    .errorText(ExceptionCode.UNKNOWN_EXCEPTION.getErrorCode())
+                    .build();
+        }
     }
 
-    private AddProductResponse addProductResponse(AddProductRequest rq, Long userId, String role) {
+    private AddProductResponse addProductResponse(AddProductRequest rq, Long userId, String role) throws OrderException {
         GetProductsInfoResponse productInfo = integrationService.getProductInfoByIds(List.of(rq.getProductId()), role);
         BasketEntity entity = new BasketEntity(
                 userId,
@@ -71,42 +164,42 @@ public class BasketServiceImpl implements IBasketService {
                 rq.getCount()
         );
         basketRepository.save(entity);
-        return new AddProductResponse(true);
+        return AddProductResponse.builder().success(true).build();
     }
 
-    private DeleteProductResponse deleteProductResponse(DeleteProductRequest rq, Long userId) {
+    private DeleteProductResponse deleteProductResponse(DeleteProductRequest rq, Long userId) throws OrderException {
         boolean productIsExist = basketRepository.existsBasketEntityByProductIdAndUserId(rq.getProductId(), userId);
         if (!productIsExist) {
-            throw new RuntimeException("У пользователя нет запрашиваемого продукта");
+            throw new OrderException(ExceptionCode.PRODUCT_NOT_FOUND, "У пользователя нет запрашиваемого продукта");
         }
         int countDeleteRows = basketRepository.deleteByProductIdAndUserId(rq.getProductId(), userId);
         if (countDeleteRows != 1) {
-            throw new RuntimeException("Произошла ошибка при удалении продукта из корзины, количество затронутых строк " + countDeleteRows);
+            throw new OrderException(ExceptionCode.DELETE_PRODUCT_ERROR, "Произошла ошибка при удалении продукта из корзины, количество затронутых строк " + countDeleteRows);
         }
-        return new DeleteProductResponse(true);
+        return DeleteProductResponse.builder().success(true).build();
     }
 
-    private ChangeCountProductResponse changeCountProductResponse(ChangeCountProductRequest rq, Long userId) {
+    private ChangeCountProductResponse changeCountProductResponse(ChangeCountProductRequest rq, Long userId) throws OrderException {
         boolean productIsExist = basketRepository.existsBasketEntityByProductIdAndUserId(rq.getProductId(), userId);
         if (!productIsExist) {
-            throw new RuntimeException("У пользователя нет запрашиваемого продукта");
+            throw new OrderException(ExceptionCode.PRODUCT_NOT_FOUND, "У пользователя нет запрашиваемого продукта");
         }
         int countUpdatedRows = basketRepository.updateCountByProductIdAndUserId(rq.getProductId(), userId, rq.getCount());
         if (countUpdatedRows != 1) {
-            throw new RuntimeException("Произошла ошибка при обновлении количества позиций продукта, количество затронутых строк " + countUpdatedRows);
+            throw new OrderException(ExceptionCode.UNKNOWN_EXCEPTION, "Произошла ошибка при обновлении количества позиций продукта, количество затронутых строк " + countUpdatedRows);
         }
-        return new ChangeCountProductResponse(true);
+        return ChangeCountProductResponse.builder().success(true).build();
     }
 
     private DeleteAllProductResponse deleteAllProductResponse(Long userId) {
         basketRepository.deleteByUserId(userId);
-        return new DeleteAllProductResponse(true);
+        return DeleteAllProductResponse.builder().success(true).build();
     }
 
-    private GetBasketResponse getBasketResponse(Long userId, String role) {
+    private GetBasketResponse getBasketResponse(Long userId, String role) throws OrderException {
         List<BasketEntity> basketEntities = basketRepository.findByUserId(userId);
         if (basketEntities.isEmpty()) {
-            throw new RuntimeException("У пользователя нет продуктов в корзине");
+            throw new OrderException(ExceptionCode.PRODUCT_NOT_FOUND, "У пользователя нет продуктов в корзине");
         }
         List<Long> productIds = new ArrayList<>();
         basketEntities.forEach(basketEntity -> {
@@ -114,7 +207,7 @@ public class BasketServiceImpl implements IBasketService {
         });
         GetProductsInfoResponse productsInfo = integrationService.getProductInfoByIds(productIds, role);
         if (productsInfo.getProductsInfo().isEmpty() || productsInfo.getProductsInfo().size() != productIds.size()) {
-            throw new RuntimeException("Получена не вся информация о продуктах");
+            throw new OrderException(ExceptionCode.GET_PRODUCTS_INFO_NOT_COMPLETE, "Получена не вся информация о продуктах");
         }
         List<Product> productsResponse = new ArrayList<>();
         AtomicReference<Long> totalPrice = new AtomicReference<>(0L);
@@ -131,20 +224,24 @@ public class BasketServiceImpl implements IBasketService {
             ));
             totalPrice.updateAndGet(v -> v + productInfo.getPrice() * basketEntity.getCount());
         });
-        return new GetBasketResponse(productsResponse, totalPrice.get());
+        return GetBasketResponse.builder()
+                .success(true)
+                .products(productsResponse)
+                .totalPrice(totalPrice.get())
+                .build();
     }
 
-    private ApplyPromocodeResponse applyPromocodeResponse(ApplyPromocodeRequest rq, Long userId, String role) {
+    private ApplyPromocodeResponse applyPromocodeResponse(ApplyPromocodeRequest rq, Long userId, String role) throws OrderException {
         PromocodeEntity promocodeEntity = promocodeRepository.findByPromocode(rq.getPromocode());
         if (promocodeEntity == null) {
-            throw new RuntimeException("Промокода не существует");
+            throw new OrderException(ExceptionCode.PROMOCODE_NOT_FOUND, "Промокода не существует");
         }
         if (!promocodeEntity.getActual()) {
-            throw new RuntimeException("Промокод не активный");
+            throw new OrderException(ExceptionCode.PROMOCODE_NOT_ACTUAL, "Промокод не активный");
         }
         List<BasketEntity> basketEntities = basketRepository.findByUserId(userId);
         if (basketEntities.isEmpty()) {
-            throw new RuntimeException("У пользователя нет продуктов в корзине");
+            throw new OrderException(ExceptionCode.USER_BASKET_IS_EMPTY, "У пользователя нет продуктов в корзине");
         }
         List<Long> productIds = new ArrayList<>();
         basketEntities.forEach(basketEntity -> {
@@ -152,7 +249,7 @@ public class BasketServiceImpl implements IBasketService {
         });
         GetProductsInfoResponse productsInfo = integrationService.getProductInfoByIds(productIds, role);
         if (productsInfo.getProductsInfo().isEmpty() || productsInfo.getProductsInfo().size() != productIds.size()) {
-            throw new RuntimeException("Получена не вся информация о продуктах");
+            throw new OrderException(ExceptionCode.GET_PRODUCTS_INFO_NOT_COMPLETE, "Получена не вся информация о продуктах");
         }
         List<Product> productsResponse = new ArrayList<>();
         AtomicReference<Long> totalPrice = new AtomicReference<>(0L);
@@ -171,6 +268,12 @@ public class BasketServiceImpl implements IBasketService {
             totalPrice.updateAndGet(v -> v + productInfo.getPrice() * basketEntity.getCount());
             totalPromoPrice.updateAndGet(v -> (long) (v + (productInfo.getPrice() * (1 - promocodeEntity.getPercent() / 100.00)) * basketEntity.getCount()));
         });
-        return new ApplyPromocodeResponse(productsResponse, totalPrice.get(), totalPromoPrice.get());
+        return ApplyPromocodeResponse.builder()
+                .success(true)
+                .products(productsResponse)
+                .totalPrice(totalPrice.get())
+                .totalPricePromo(totalPromoPrice.get())
+                .build();
     }
+
 }

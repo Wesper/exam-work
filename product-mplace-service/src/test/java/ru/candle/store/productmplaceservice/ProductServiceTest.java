@@ -7,6 +7,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+import ru.candle.store.productmplaceservice.dictionary.ExceptionCode;
 import ru.candle.store.productmplaceservice.dto.IAvgRatingByProduct;
 import ru.candle.store.productmplaceservice.dto.Product;
 import ru.candle.store.productmplaceservice.dto.Review;
@@ -15,6 +16,7 @@ import ru.candle.store.productmplaceservice.dto.response.*;
 import ru.candle.store.productmplaceservice.entity.ProductEntity;
 import ru.candle.store.productmplaceservice.entity.ProductRatingEntity;
 import ru.candle.store.productmplaceservice.entity.ProductReviewEntity;
+import ru.candle.store.productmplaceservice.exception.ProductMplaceException;
 import ru.candle.store.productmplaceservice.impl.AvgRatingByProductImpl;
 import ru.candle.store.productmplaceservice.repository.ProductRatingRepository;
 import ru.candle.store.productmplaceservice.repository.ProductRepository;
@@ -48,7 +50,13 @@ public class ProductServiceTest {
     void whenRequestAllProductsButThereNone() {
         Mockito.when(productRepository.findAllByActual(true)).thenReturn(null);
 
-        Assertions.assertThrows(RuntimeException.class, () -> productService.getAllProducts());
+        GetAllProductsResponse response = productService.getAllProducts();
+        Assertions.assertAll(
+                () -> Assertions.assertTrue(response.getSuccess()),
+                () -> Assertions.assertNull(response.getErrorCode()),
+                () -> Assertions.assertNull(response.getErrorText()),
+                () -> Assertions.assertEquals(new ArrayList<>(), response.getProducts())
+        );
         Mockito.verify(productRepository, Mockito.times(1)).findAllByActual(true);
         Mockito.verify(ratingRepository, Mockito.times(0)).getAvgRatingInGroupByProduct(Mockito.any());
     }
@@ -69,7 +77,7 @@ public class ProductServiceTest {
 
         GetAllProductsResponse response = productService.getAllProducts();
         Assertions.assertAll(
-                () -> Assertions.assertTrue(response.isSuccess()),
+                () -> Assertions.assertTrue(response.getSuccess()),
                 () -> Assertions.assertEquals(2, response.getProducts().size()),
                 () -> Assertions.assertEquals(expProducts.get(0), response.getProducts().get(0)),
                 () -> Assertions.assertEquals(expProducts.get(1), response.getProducts().get(1))
@@ -82,9 +90,15 @@ public class ProductServiceTest {
     void whenRequestProductCardButThereNone() {
         Long userId = 1L;
         GetProductCardRequest request = new GetProductCardRequest(2L);
-        Mockito.when(productRepository.findById(Mockito.any())).thenReturn(null);
+        Mockito.when(productRepository.findById(Mockito.any())).thenReturn(Optional.ofNullable(null));
 
-        Assertions.assertThrows(RuntimeException.class, () -> productService.getProductCard(request, userId));
+        GetProductCardResponse response = productService.getProductCard(request, userId);
+        Assertions.assertAll(
+                () -> Assertions.assertFalse(response.getSuccess()),
+                () -> Assertions.assertEquals(ExceptionCode.NOT_FOUND.getErrorCode(), response.getErrorCode()),
+                () -> Assertions.assertEquals(ExceptionCode.NOT_FOUND.getErrorText(), response.getErrorText())
+        );
+
         Mockito.verify(productRepository, Mockito.times(1)).findById(Mockito.any());
         Mockito.verify(reviewRepository, Mockito.times(0)).findAllByProductId(Mockito.any());
         Mockito.verify(ratingRepository, Mockito.times(0)).getAvgRatingByProduct(Mockito.any());
@@ -103,7 +117,7 @@ public class ProductServiceTest {
         List<Review> expReviews = new ArrayList<>();
         expReviews.add(new Review(1L, "Review text"));
         expReviews.add(new Review(2L, "Review text 2"));
-        GetProductCardResponse expProducts = new GetProductCardResponse(2L, "a.jpeg", "Product 2", "If you buy the product you win", 1L, "1", "kg", "A", 2.5, true, true, expReviews);
+        GetProductCardResponse expProducts = new GetProductCardResponse(true, 2L, "a.jpeg", "Product 2", "If you buy the product you win", 1L, "1", "kg", "A", 2.5, true, true, expReviews, null, null);
         Mockito.when(productRepository.findById(Mockito.any())).thenReturn(Optional.of(product));
         Mockito.when(reviewRepository.findAllByProductId(Mockito.any())).thenReturn(reviews);
         Mockito.when(ratingRepository.getAvgRatingByProduct(Mockito.any())).thenReturn(2.5);
@@ -125,7 +139,7 @@ public class ProductServiceTest {
         ProductEntity product = new ProductEntity(2L, "a.jpeg", "Product 2", "If you buy the product you win", "Best of product", 1L, "A", "1", "kg", true);
 
         List<Review> expReviews = new ArrayList<>();
-        GetProductCardResponse expProducts = new GetProductCardResponse(2L, "a.jpeg", "Product 2", "If you buy the product you win", 1L, "1", "kg", "A", 0.0, true, false, expReviews);
+        GetProductCardResponse expProducts = new GetProductCardResponse(true, 2L, "a.jpeg", "Product 2", "If you buy the product you win", 1L, "1", "kg", "A", 0.0, true, false, expReviews, null, null);
         Mockito.when(productRepository.findById(Mockito.any())).thenReturn(Optional.of(product));
         Mockito.when(reviewRepository.findAllByProductId(Mockito.any())).thenReturn(null);
         Mockito.when(ratingRepository.getAvgRatingByProduct(Mockito.any())).thenReturn(null);
@@ -146,7 +160,7 @@ public class ProductServiceTest {
         AddProductRequest request = new AddProductRequest("a.jpeg", "title", "description", "subtitle", 1L, "type", "measure", "unit", true);
 
         AddProductResponse response = productService.addProduct(request);
-        Assertions.assertTrue(response.isSuccess());
+        Assertions.assertTrue(response.getSuccess());
         Mockito.verify(productRepository, Mockito.times(1)).save(Mockito.any());
     }
 
@@ -154,8 +168,13 @@ public class ProductServiceTest {
     void whenAddProductFail() {
         Mockito.when(productRepository.save(Mockito.any())).thenThrow(IllegalArgumentException.class);
         AddProductRequest request = new AddProductRequest("a.jpeg", "title", "description", "subtitle", 1L, "type", "measure", "unit", true);
+        AddProductResponse response = productService.addProduct(request);
 
-        Assertions.assertThrows(IllegalArgumentException.class, () -> productService.addProduct(request));
+        Assertions.assertAll(
+                () -> Assertions.assertFalse(response.getSuccess()),
+                () -> Assertions.assertEquals(ExceptionCode.UNKNOWN_EXCEPTION.getErrorCode(), response.getErrorCode()),
+                () -> Assertions.assertEquals(ExceptionCode.UNKNOWN_EXCEPTION.getErrorText(), response.getErrorText())
+        );
         Mockito.verify(productRepository, Mockito.times(1)).save(Mockito.any());
     }
 
@@ -165,7 +184,7 @@ public class ProductServiceTest {
         UpdateProductRequest request = new UpdateProductRequest(1L, "a.jpeg", "title", "description", "subtitle", 1L, "type", "measure", "unit", true);
 
         UpdateProductResponse response = productService.updateProduct(request);
-        Assertions.assertTrue(response.isSuccess());
+        Assertions.assertTrue(response.getSuccess());
         Mockito.verify(productRepository, Mockito.times(1)).save(Mockito.any());
     }
 
@@ -173,8 +192,13 @@ public class ProductServiceTest {
     void whenUpdateProductFail() {
         Mockito.when(productRepository.save(Mockito.any())).thenThrow(IllegalArgumentException.class);
         UpdateProductRequest request = new UpdateProductRequest(1L, "a.jpeg", "title", "description", "subtitle", 1L, "type", "measure", "unit", true);
+        UpdateProductResponse response = productService.updateProduct(request);
 
-        Assertions.assertThrows(IllegalArgumentException.class, () -> productService.updateProduct(request));
+        Assertions.assertAll(
+                () -> Assertions.assertFalse(response.getSuccess()),
+                () -> Assertions.assertEquals(ExceptionCode.UNKNOWN_EXCEPTION.getErrorCode(), response.getErrorCode()),
+                () -> Assertions.assertEquals(ExceptionCode.UNKNOWN_EXCEPTION.getErrorText(), response.getErrorText())
+        );
         Mockito.verify(productRepository, Mockito.times(1)).save(Mockito.any());
     }
 
@@ -184,7 +208,7 @@ public class ProductServiceTest {
         ChangeProductAvailableRequest request = new ChangeProductAvailableRequest(1L, false);
 
         ChangeProductAvailableResponse response = productService.changeProductAvailable(request);
-        Assertions.assertTrue(response.isSuccess());
+        Assertions.assertTrue(response.getSuccess());
         Mockito.verify(productRepository, Mockito.times(1)).updateActualById(Mockito.any(), Mockito.any());
     }
 
@@ -192,61 +216,101 @@ public class ProductServiceTest {
     void whenChangeProductAvailableFail() {
         Mockito.when(productRepository.updateActualById(Mockito.any(), Mockito.any())).thenReturn(0);
         ChangeProductAvailableRequest request = new ChangeProductAvailableRequest(1L, false);
+        ChangeProductAvailableResponse response = productService.changeProductAvailable(request);
 
-        Assertions.assertThrows(RuntimeException.class, () -> productService.changeProductAvailable(request));
+        Assertions.assertAll(
+                () -> Assertions.assertFalse(response.getSuccess()),
+                () -> Assertions.assertEquals(ExceptionCode.UPDATE_AVAILABLE_FAIL.getErrorCode(), response.getErrorCode()),
+                () -> Assertions.assertEquals(ExceptionCode.UPDATE_AVAILABLE_FAIL.getErrorText(), response.getErrorText())
+        );
         Mockito.verify(productRepository, Mockito.times(1)).updateActualById(Mockito.any(), Mockito.any());
     }
 
     @Test
-    void whenAddReviewSuccess() {
+    void whenAddReviewTrue() throws ProductMplaceException {
         Long userId = 1L;
+        String role = "USER";
         ProductReviewEntity review = new ProductReviewEntity(1L, 1L, "review");
         Mockito.when(reviewRepository.save(review)).thenReturn(review);
-        Mockito.when(integrationService.isUserPurchasedProduct(1L, 1L)).thenReturn(true);
+        Mockito.when(integrationService.isUserPurchasedProduct(1L, 1L, "USER")).thenReturn(true);
         AddReviewRequest request = new AddReviewRequest(1L, "review");
 
-        AddReviewResponse response = productService.addReview(request, userId);
-        Assertions.assertTrue(response.isSuccess());
+        AddReviewResponse response = productService.addReview(request, userId, role);
+        Assertions.assertTrue(response.getSuccess());
         Mockito.verify(reviewRepository, Mockito.times(1)).save(Mockito.any());
-        Mockito.verify(integrationService, Mockito.times(1)).isUserPurchasedProduct(Mockito.any(), Mockito.any());
+        Mockito.verify(integrationService, Mockito.times(1)).isUserPurchasedProduct(Mockito.any(),
+                Mockito.any(), Mockito.any());
     }
 
     @Test
-    void whenAddReviewFail() {
+    void whenAddReviewFalse() throws ProductMplaceException {
         Long userId = 1L;
-        ProductReviewEntity review = new ProductReviewEntity(1L, 1L, "review");
-        Mockito.when(integrationService.isUserPurchasedProduct(1L, 1L)).thenReturn(false);
+        String role = "USER";
+        Mockito.when(integrationService.isUserPurchasedProduct(1L, 1L, "USER")).thenReturn(false);
         AddReviewRequest request = new AddReviewRequest(1L, "review");
 
-        Assertions.assertThrows(RuntimeException.class, () -> productService.addReview(request, userId));
+        AddReviewResponse response = productService.addReview(request, userId, role);
+        Assertions.assertAll(
+                () -> Assertions.assertFalse(response.getSuccess()),
+                () -> Assertions.assertEquals(ExceptionCode.REVIEW_ACCESS_DENY.getErrorCode(), response.getErrorCode()),
+                () -> Assertions.assertEquals(ExceptionCode.REVIEW_ACCESS_DENY.getErrorText(), response.getErrorText())
+        );
         Mockito.verify(productRepository, Mockito.times(0)).save(Mockito.any());
-        Mockito.verify(integrationService, Mockito.times(1)).isUserPurchasedProduct(Mockito.any(), Mockito.any());
+        Mockito.verify(integrationService, Mockito.times(1)).isUserPurchasedProduct(Mockito.any(),
+                Mockito.any(), Mockito.any());
     }
 
     @Test
-    void whenAddRatingSuccess() {
+    void whenAddReviewFail() throws ProductMplaceException {
         Long userId = 1L;
+        String role = "USER";
+        Mockito.when(integrationService.isUserPurchasedProduct(1L, 1L, "USER"))
+                .thenThrow(new ProductMplaceException(ExceptionCode.CHECK_PURCHASED_FAIL, "Ошибка"));
+        AddReviewRequest request = new AddReviewRequest(1L, "review");
+        AddReviewResponse response = productService.addReview(request, userId, role);
+        Assertions.assertAll(
+                () -> Assertions.assertFalse(response.getSuccess()),
+                () -> Assertions.assertEquals(ExceptionCode.CHECK_PURCHASED_FAIL.getErrorCode(), response.getErrorCode()),
+                () -> Assertions.assertEquals(ExceptionCode.CHECK_PURCHASED_FAIL.getErrorText(), response.getErrorText())
+        );
+        Mockito.verify(productRepository, Mockito.times(0)).save(Mockito.any());
+        Mockito.verify(integrationService, Mockito.times(1)).isUserPurchasedProduct(Mockito.any(),
+                Mockito.any(), Mockito.any());
+    }
+
+    @Test
+    void whenAddRatingSuccess() throws ProductMplaceException {
+        Long userId = 1L;
+        String role = "USER";
         ProductRatingEntity review = new ProductRatingEntity(1L, 1L, 1L);
         Mockito.when(ratingRepository.save(review)).thenReturn(review);
-        Mockito.when(integrationService.isUserPurchasedProduct(1L, 1L)).thenReturn(true);
+        Mockito.when(integrationService.isUserPurchasedProduct(1L, 1L, "USER")).thenReturn(true);
         AddRatingRequest request = new AddRatingRequest(1L, 1L);
 
-        AddRatingResponse response = productService.addRating(request, userId);
-        Assertions.assertTrue(response.isSuccess());
+        AddRatingResponse response = productService.addRating(request, userId, role);
+        Assertions.assertTrue(response.getSuccess());
         Mockito.verify(ratingRepository, Mockito.times(1)).save(Mockito.any());
-        Mockito.verify(integrationService, Mockito.times(1)).isUserPurchasedProduct(Mockito.any(), Mockito.any());
+        Mockito.verify(integrationService, Mockito.times(1)).isUserPurchasedProduct(Mockito.any(),
+                Mockito.any(), Mockito.any());
     }
 
     @Test
-    void whenAddRatingFail() {
+    void whenAddRatingFail() throws ProductMplaceException {
         Long userId = 1L;
+        String role = "USER";
         ProductRatingEntity review = new ProductRatingEntity(1L, 1L, 1L);
-        Mockito.when(integrationService.isUserPurchasedProduct(1L, 1L)).thenReturn(false);
+        Mockito.when(integrationService.isUserPurchasedProduct(1L, 1L, "USER")).thenReturn(false);
         AddRatingRequest request = new AddRatingRequest(1L, 1L);
 
-        Assertions.assertThrows(RuntimeException.class, () -> productService.addRating(request, userId));
+        AddRatingResponse response = productService.addRating(request, userId, role);
+        Assertions.assertAll(
+                () -> Assertions.assertFalse(response.getSuccess()),
+                () -> Assertions.assertEquals(ExceptionCode.RATING_ACCESS_DENY.getErrorCode(), response.getErrorCode()),
+                () -> Assertions.assertEquals(ExceptionCode.RATING_ACCESS_DENY.getErrorText(), response.getErrorText())
+        );
         Mockito.verify(ratingRepository, Mockito.times(0)).save(Mockito.any());
-        Mockito.verify(integrationService, Mockito.times(1)).isUserPurchasedProduct(Mockito.any(), Mockito.any());
+        Mockito.verify(integrationService, Mockito.times(1)).isUserPurchasedProduct(Mockito.any(),
+                Mockito.any(), Mockito.any());
     }
 
 

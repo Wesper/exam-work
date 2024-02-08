@@ -13,6 +13,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import ru.candle.store.orderservice.config.OrderConfig;
 import ru.candle.store.orderservice.controller.PromocodeController;
+import ru.candle.store.orderservice.dictionary.ExceptionCode;
 import ru.candle.store.orderservice.dto.request.promocodes.AddPromocodeRequest;
 import ru.candle.store.orderservice.dto.request.promocodes.ChangePromocodeActualRequest;
 import ru.candle.store.orderservice.dto.response.Promocode;
@@ -43,8 +44,8 @@ public class PromocodeControllerTest {
     @Test
     void whenAddPromocodeSuccess() throws Exception {
         AddPromocodeRequest rq = new AddPromocodeRequest("promo", 2L, true);
-        Mockito.when(service.addPromocode(rq)).thenReturn(new AddPromocodeResponse(true));
-        AddPromocodeResponse rs = new AddPromocodeResponse(true);
+        AddPromocodeResponse rs = AddPromocodeResponse.builder().success(true).build();
+        Mockito.when(service.addPromocode(rq)).thenReturn(rs);
 
         mockMvc.perform(MockMvcRequestBuilders.post("/promocode/add").header("role", "ADMIN").content(objectMapper.writeValueAsString(rq)).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
@@ -54,16 +55,25 @@ public class PromocodeControllerTest {
     @Test
     void whenAddPromocodeFail() throws Exception {
         AddPromocodeRequest rq = new AddPromocodeRequest("promo", 2L, true);
-        Mockito.when(service.addPromocode(rq)).thenReturn(new AddPromocodeResponse(true));
-        AddPromocodeResponse rs = new AddPromocodeResponse(true);
+        AddPromocodeResponse rs = AddPromocodeResponse.builder()
+                .success(false)
+                .errorCode(ExceptionCode.PROMOCODE_NOT_FOUND.getErrorCode())
+                .errorText(ExceptionCode.PROMOCODE_NOT_FOUND.getErrorText())
+                .build();
+        Mockito.when(service.addPromocode(rq)).thenReturn(rs);
 
-        mockMvc.perform(MockMvcRequestBuilders.post("/promocode/add").header("role", "MANAGER").content(objectMapper.writeValueAsString(rq)).contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().is4xxClientError());
+        mockMvc.perform(MockMvcRequestBuilders.post("/promocode/add").header("role", "ADMIN").content(objectMapper.writeValueAsString(rq)).contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(content().json(objectMapper.writeValueAsString(rs)));
     }
 
     @Test
     void whenGetPromocodeSuccess() throws Exception {
-        GetPromocodeResponse rs = new GetPromocodeResponse("promo", 1L);
+        GetPromocodeResponse rs = GetPromocodeResponse.builder()
+                .success(true)
+                .promocode("promo")
+                .percent(1L)
+                .build();
         Mockito.when(service.getPromocode("promo")).thenReturn(rs);
 
         mockMvc.perform(MockMvcRequestBuilders.get("/promocode/get/promo").header("role", "USER"))
@@ -73,11 +83,16 @@ public class PromocodeControllerTest {
 
     @Test
     void whenGetPromocodeFail() throws Exception {
-        GetPromocodeResponse rs = new GetPromocodeResponse("promo", 1L);
+        GetPromocodeResponse rs = GetPromocodeResponse.builder()
+                .success(true)
+                .errorCode(ExceptionCode.PROMOCODE_NOT_FOUND.getErrorCode())
+                .errorText(ExceptionCode.PRODUCT_NOT_FOUND.getErrorText())
+                .build();
         Mockito.when(service.getPromocode("promo")).thenReturn(rs);
 
-        mockMvc.perform(MockMvcRequestBuilders.get("/promocode/get/promo").header("role", "MANAGER"))
-                .andExpect(status().is4xxClientError());
+        mockMvc.perform(MockMvcRequestBuilders.get("/promocode/get/promo").header("role", "USER"))
+                .andExpect(status().isOk())
+                .andExpect(content().json(objectMapper.writeValueAsString(rs)));
     }
 
     @Test
@@ -86,7 +101,7 @@ public class PromocodeControllerTest {
                 new Promocode("promo", 1L, true),
                 new Promocode("code", 2L, false)
         );
-        GetAllPromocodesResponse rs = new GetAllPromocodesResponse(promocodes);
+        GetAllPromocodesResponse rs = GetAllPromocodesResponse.builder().success(true).promocodes(promocodes).build();
         Mockito.when(service.getAllPromocodes()).thenReturn(rs);
 
         mockMvc.perform(MockMvcRequestBuilders.get("/promocode/get").header("role", "ADMIN"))
@@ -100,18 +115,26 @@ public class PromocodeControllerTest {
                 new Promocode("promo", 1L, true),
                 new Promocode("code", 2L, false)
         );
-        GetAllPromocodesResponse rs = new GetAllPromocodesResponse(promocodes);
+        GetAllPromocodesResponse rs = GetAllPromocodesResponse.builder()
+                .success(false)
+                .errorCode(ExceptionCode.PROMOCODE_LIST_IS_EMPTY.getErrorCode())
+                .errorText(ExceptionCode.PROMOCODE_LIST_IS_EMPTY.getErrorText())
+                .build();
         Mockito.when(service.getAllPromocodes()).thenReturn(rs);
 
-        mockMvc.perform(MockMvcRequestBuilders.get("/promocode/get").header("role", "User"))
-                .andExpect(status().is4xxClientError());
+        mockMvc.perform(MockMvcRequestBuilders.get("/promocode/get").header("role", "ADMIN"))
+                .andExpect(status().isOk())
+                .andExpect(content().json(objectMapper.writeValueAsString(rs)));
     }
 
     @Test
     void whenChangePromocodeActualSuccess() throws Exception {
-        ChangePromocodeActualRequest rq = new ChangePromocodeActualRequest("promo", false);
-        Mockito.when(service.changePromocodeActual(rq)).thenReturn(new ChangePromocodeActualResponse(true));
-        AddPromocodeResponse rs = new AddPromocodeResponse(true);
+        ChangePromocodeActualRequest rq = ChangePromocodeActualRequest.builder()
+                .promocode("promo")
+                .actual(false)
+                .build();
+        ChangePromocodeActualResponse rs = ChangePromocodeActualResponse.builder().success(true).build();
+        Mockito.when(service.changePromocodeActual(rq)).thenReturn(rs);
 
         mockMvc.perform(MockMvcRequestBuilders.post("/promocode/actual/change").header("role", "ADMIN").content(objectMapper.writeValueAsString(rq)).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
@@ -120,11 +143,19 @@ public class PromocodeControllerTest {
 
     @Test
     void whenChangePromocodeActualFail() throws Exception {
-        ChangePromocodeActualRequest rq = new ChangePromocodeActualRequest("promo", false);
-        Mockito.when(service.changePromocodeActual(rq)).thenReturn(new ChangePromocodeActualResponse(true));
-        AddPromocodeResponse rs = new AddPromocodeResponse(true);
+        ChangePromocodeActualRequest rq = ChangePromocodeActualRequest.builder()
+                .promocode("promo")
+                .actual(false)
+                .build();
+        ChangePromocodeActualResponse rs = ChangePromocodeActualResponse.builder()
+                .success(false)
+                .errorCode(ExceptionCode.PROMOCODE_NOT_FOUND.getErrorCode())
+                .errorText(ExceptionCode.PRODUCT_NOT_FOUND.getErrorText())
+                .build();
+        Mockito.when(service.changePromocodeActual(rq)).thenReturn(rs);
 
-        mockMvc.perform(MockMvcRequestBuilders.post("/promocode/actual/change").header("role", "MANAGER").content(objectMapper.writeValueAsString(rq)).contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().is4xxClientError());
+        mockMvc.perform(MockMvcRequestBuilders.post("/promocode/actual/change").header("role", "ADMIN").content(objectMapper.writeValueAsString(rq)).contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(content().json(objectMapper.writeValueAsString(rs)));
     }
 }

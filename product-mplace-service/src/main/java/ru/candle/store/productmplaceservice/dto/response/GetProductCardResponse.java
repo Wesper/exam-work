@@ -14,6 +14,7 @@ import java.util.List;
 @Builder
 public class GetProductCardResponse {
 
+    private Boolean success;
     private Long productId;
     private String imageId;
     private String title;
@@ -26,4 +27,6 @@ public class GetProductCardResponse {
     private Boolean actual;
     private Boolean appreciated;
     private List<Review> review;
+    private String errorCode;
+    private String errorText;
 }

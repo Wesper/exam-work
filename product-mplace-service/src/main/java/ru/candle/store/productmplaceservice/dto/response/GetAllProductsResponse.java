@@ -14,8 +14,10 @@ import java.util.List;
 @Builder
 public class GetAllProductsResponse {
 
-    private boolean success;
+    private Boolean success;
 
     private List<Product> products;
+    private String errorCode;
+    private String errorText;
 
 }

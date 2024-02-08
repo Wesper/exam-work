@@ -7,6 +7,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+import ru.candle.store.orderservice.dictionary.ExceptionCode;
 import ru.candle.store.orderservice.dto.request.promocodes.AddPromocodeRequest;
 import ru.candle.store.orderservice.dto.request.promocodes.ChangePromocodeActualRequest;
 import ru.candle.store.orderservice.dto.response.Promocode;
@@ -37,7 +38,7 @@ public class PromocodeServiceTest {
         Mockito.when(promocodeRepository.save(promocodeEntity)).thenReturn(promocodeEntity);
 
         AddPromocodeResponse rs = service.addPromocode(rq);
-        Assertions.assertEquals(new AddPromocodeResponse(true), rs);
+        Assertions.assertEquals(AddPromocodeResponse.builder().success(true).build(), rs);
     }
 
     @Test
@@ -46,7 +47,12 @@ public class PromocodeServiceTest {
         PromocodeEntity promocodeEntity = new PromocodeEntity("promo", 10L, true);
         Mockito.when(promocodeRepository.save(promocodeEntity)).thenThrow(IllegalArgumentException.class);
 
-        Assertions.assertThrows(RuntimeException.class, () -> service.addPromocode(rq));
+        AddPromocodeResponse rs = service.addPromocode(rq);
+        Assertions.assertAll(
+                () -> Assertions.assertFalse(rs.getSuccess()),
+                () -> Assertions.assertEquals(ExceptionCode.UNKNOWN_EXCEPTION.getErrorCode(), rs.getErrorCode()),
+                () -> Assertions.assertEquals(ExceptionCode.UNKNOWN_EXCEPTION.getErrorText(), rs.getErrorText())
+        );
     }
 
     @Test
@@ -54,7 +60,11 @@ public class PromocodeServiceTest {
         String promocode = "promo";
         PromocodeEntity promocodeEntity = new PromocodeEntity("promo", 10L, true);
         Mockito.when(promocodeRepository.findByPromocode(promocode)).thenReturn(promocodeEntity);
-        GetPromocodeResponse expRs = new GetPromocodeResponse("promo", 10L);
+        GetPromocodeResponse expRs = GetPromocodeResponse.builder()
+                .success(true)
+                .promocode("promo")
+                .percent(10L)
+                .build();
         GetPromocodeResponse actRs = service.getPromocode(promocode);
         Assertions.assertEquals(expRs, actRs);
     }
@@ -64,7 +74,12 @@ public class PromocodeServiceTest {
         String promocode = "promo";
         Mockito.when(promocodeRepository.findByPromocode(promocode)).thenReturn(null);
 
-        Assertions.assertThrows(RuntimeException.class, () -> service.getPromocode(promocode));
+        GetPromocodeResponse rs = service.getPromocode(promocode);
+        Assertions.assertAll(
+                () -> Assertions.assertFalse(rs.getSuccess()),
+                () -> Assertions.assertEquals(ExceptionCode.PROMOCODE_NOT_FOUND.getErrorCode(), rs.getErrorCode()),
+                () -> Assertions.assertEquals(ExceptionCode.PROMOCODE_NOT_FOUND.getErrorText(), rs.getErrorText())
+        );
     }
 
     @Test
@@ -75,7 +90,7 @@ public class PromocodeServiceTest {
         Mockito.when(promocodeRepository.findByPromocode("promo")).thenReturn(promocodeEntityBefore);
         Mockito.when(promocodeRepository.save(promocodeEntityAfter)).thenReturn(promocodeEntityAfter);
         ChangePromocodeActualResponse actRs = service.changePromocodeActual(rq);
-        Assertions.assertEquals(new ChangePromocodeActualResponse(true), actRs);
+        Assertions.assertEquals(ChangePromocodeActualResponse.builder().success(true).build(), actRs);
     }
 
     @Test
@@ -83,18 +98,27 @@ public class PromocodeServiceTest {
         ChangePromocodeActualRequest rq = new ChangePromocodeActualRequest("promo", false);
         Mockito.when(promocodeRepository.findByPromocode(rq.getPromocode())).thenReturn(null);
 
-        Assertions.assertThrows(RuntimeException.class, () -> service.changePromocodeActual(rq));
+        ChangePromocodeActualResponse rs = service.changePromocodeActual(rq);
+        Assertions.assertAll(
+                () -> Assertions.assertFalse(rs.getSuccess()),
+                () -> Assertions.assertEquals(ExceptionCode.PROMOCODE_NOT_FOUND.getErrorCode(), rs.getErrorCode()),
+                () -> Assertions.assertEquals(ExceptionCode.PROMOCODE_NOT_FOUND.getErrorText(), rs.getErrorText())
+        );
     }
 
     @Test
     void whenGetAllPromocodesResponseSuccess() {
-        List<PromocodeEntity> promocodesEntity = new ArrayList<>();
-        promocodesEntity.add(new PromocodeEntity("promo", 10L, false));
-        promocodesEntity.add(new PromocodeEntity("code", 20L, true));
-        GetAllPromocodesResponse expRs = new GetAllPromocodesResponse();
-        expRs.setPromocodes(new ArrayList<>());
-        expRs.getPromocodes().add(new Promocode("promo", 10L, false));
-        expRs.getPromocodes().add(new Promocode("code", 20L, true));
+        List<PromocodeEntity> promocodesEntity = List.of(
+                new PromocodeEntity("promo", 10L, false),
+                new PromocodeEntity("code", 20L, true));
+        List<Promocode> promocodes = List.of(
+                new Promocode("promo", 10L, false),
+                new Promocode("code", 20L, true)
+        );
+        GetAllPromocodesResponse expRs = GetAllPromocodesResponse.builder()
+                .success(true)
+                .promocodes(promocodes)
+                .build();
 
         Mockito.when(promocodeRepository.findAll()).thenReturn(promocodesEntity);
         GetAllPromocodesResponse actRs = service.getAllPromocodes();
@@ -102,9 +126,13 @@ public class PromocodeServiceTest {
     }
 
     @Test
-    void whenGetAllPromocodesResponseFalse() {
-        Mockito.when(promocodeRepository.findAll()).thenReturn(null);
+    void whenGetAllPromocodesResponseEmpty() {
+        Mockito.when(promocodeRepository.findAll()).thenReturn(new ArrayList<>());
 
-        Assertions.assertThrows(RuntimeException.class, () -> service.getAllPromocodes());
+        GetAllPromocodesResponse rs = service.getAllPromocodes();
+        Assertions.assertAll(
+                () -> Assertions.assertTrue(rs.getSuccess()),
+                () -> Assertions.assertEquals(new ArrayList<>(), rs.getPromocodes())
+        );
     }
 }

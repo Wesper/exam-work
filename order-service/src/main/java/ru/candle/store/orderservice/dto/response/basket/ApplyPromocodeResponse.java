@@ -14,7 +14,10 @@ import java.util.List;
 @Builder
 public class ApplyPromocodeResponse {
 
+    private Boolean success;
     private List<Product> products;
     private Long totalPrice;
     private Long totalPricePromo;
+    private String errorCode;
+    private String errorText;
 }

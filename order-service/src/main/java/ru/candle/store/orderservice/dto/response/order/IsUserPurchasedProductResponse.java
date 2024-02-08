@@ -1,4 +1,4 @@
-package ru.candle.store.productmplaceservice.dto.response;
+package ru.candle.store.orderservice.dto.response.order;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -15,5 +15,4 @@ public class IsUserPurchasedProductResponse {
     private Boolean isPurchased;
     private String errorCode;
     private String errorText;
-
 }

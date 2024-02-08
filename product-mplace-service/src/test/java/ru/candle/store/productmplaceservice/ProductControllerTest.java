@@ -1,8 +1,6 @@
 package ru.candle.store.productmplaceservice;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import jakarta.servlet.ServletException;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,7 +41,10 @@ public class ProductControllerTest {
     void whenRequestGetAllProductsSuccess() throws Exception {
         List<Product> products = new ArrayList<>();
         products.add(new Product(1L, "a.jpeg", "title", "subtitle", 1L, "type", 0.0));
-        GetAllProductsResponse response = new GetAllProductsResponse(true, products);
+        GetAllProductsResponse response = GetAllProductsResponse.builder()
+                .success(true)
+                .products(products)
+                .build();
         Mockito.when(service.getAllProducts()).thenReturn(response);
 
         mockMvc.perform(MockMvcRequestBuilders.get("/product/get").contentType(MediaType.APPLICATION_JSON))
@@ -53,16 +54,37 @@ public class ProductControllerTest {
 
     @Test
     void whenRequestGetAllProductsFail() throws Exception {
-        Mockito.when(service.getAllProducts()).thenThrow(RuntimeException.class);
+        GetAllProductsResponse response = GetAllProductsResponse.builder()
+                .success(false)
+                .errorCode("code")
+                .errorText("text")
+                .build();
+        Mockito.when(service.getAllProducts()).thenReturn(response);
 
-        Assertions.assertThrows(ServletException.class, () -> mockMvc.perform(MockMvcRequestBuilders.get("/product/get").contentType(MediaType.APPLICATION_JSON)));
+        mockMvc.perform(MockMvcRequestBuilders.get("/product/get").contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(content().json(objectMapper.writeValueAsString(response)));
     }
 
     @Test
     void whenRequestGetProductCardSuccess() throws Exception {
         Long userId = 1L;
         GetProductCardRequest request = new GetProductCardRequest(1L);
-        GetProductCardResponse response = new GetProductCardResponse(1L, "a.jpeg", "title", "description", 1L, "measure", "unit", "type", 0.0, true, true, null);
+        GetProductCardResponse response = GetProductCardResponse.builder()
+                .success(true)
+                .productId(1L)
+                .imageId("a.jpeg")
+                .title("title")
+                .description("description")
+                .price(1L)
+                .measure("measure")
+                .unitMeasure("unit")
+                .type("type")
+                .rating(0.0)
+                .actual(true)
+                .appreciated(true)
+                .review(null).
+                build();
         Mockito.when(service.getProductCard(request, userId)).thenReturn(response);
 
         mockMvc.perform(MockMvcRequestBuilders.post("/product/card").header("userId", 1L).content(objectMapper.writeValueAsString(request)).contentType(MediaType.APPLICATION_JSON))
@@ -72,10 +94,7 @@ public class ProductControllerTest {
 
     @Test
     void whenRequestGetProductCardWithoutHeaderFail() throws Exception {
-        Long userId = 1L;
         GetProductCardRequest request = new GetProductCardRequest(1L);
-        GetProductCardResponse response = new GetProductCardResponse(1L, "a.jpeg", "title", "description", 1L, "measure", "unit", "type", 0.0, true, true, null);
-        Mockito.when(service.getProductCard(request, userId)).thenReturn(response);
 
         mockMvc.perform(MockMvcRequestBuilders.post("/product/card").content(objectMapper.writeValueAsString(request)).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().is4xxClientError());
@@ -85,15 +104,22 @@ public class ProductControllerTest {
     void whenRequestGetProductCardFail() throws Exception {
         Long userId = 1L;
         GetProductCardRequest request = new GetProductCardRequest(1L);
-        Mockito.when(service.getProductCard(request, userId)).thenThrow(RuntimeException.class);
+        GetProductCardResponse response = GetProductCardResponse.builder()
+                .success(false)
+                .errorCode("code")
+                .errorText("text")
+                .build();
+        Mockito.when(service.getProductCard(request, userId)).thenReturn(response);
 
-        Assertions.assertThrows(ServletException.class, () -> mockMvc.perform(MockMvcRequestBuilders.post("/product/card").header("userId", 1L).content(objectMapper.writeValueAsString(request)).contentType(MediaType.APPLICATION_JSON)));
+        mockMvc.perform(MockMvcRequestBuilders.post("/product/card").header("userId", 1L).content(objectMapper.writeValueAsString(request)).contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(content().json(objectMapper.writeValueAsString(response)));
     }
 
     @Test
     void whenRequestAddProductSuccess() throws Exception {
         AddProductRequest request = new AddProductRequest("a.jpeg", "title", "description", "subtitle", 1L, "type", "measure", "unit", true);
-        AddProductResponse response = new AddProductResponse(true);
+        AddProductResponse response = AddProductResponse.builder().success(true).build();
         Mockito.when(service.addProduct(request)).thenReturn(response);
 
         mockMvc.perform(MockMvcRequestBuilders.post("/product/add").header("role", "ADMIN").content(objectMapper.writeValueAsString(request)).contentType(MediaType.APPLICATION_JSON))
@@ -104,8 +130,6 @@ public class ProductControllerTest {
     @Test
     void whenRequestAddProductWithoutHeaderFail() throws Exception {
         AddProductRequest request = new AddProductRequest("a.jpeg", "title", "description", "subtitle", 1L, "type", "measure", "unit", true);
-        AddProductResponse response = new AddProductResponse(true);
-        Mockito.when(service.addProduct(request)).thenReturn(response);
 
         mockMvc.perform(MockMvcRequestBuilders.post("/product/add").header("role", "USER").content(objectMapper.writeValueAsString(request)).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().is4xxClientError());
@@ -117,15 +141,22 @@ public class ProductControllerTest {
     @Test
     void whenRequestAddProductFail() throws Exception {
         AddProductRequest request = new AddProductRequest("a.jpeg", "title", "description", "subtitle", 1L, "type", "measure", "unit", true);
-        Mockito.when(service.addProduct(request)).thenThrow(RuntimeException.class);
+        AddProductResponse response = AddProductResponse.builder()
+                .success(false)
+                .errorCode("code")
+                .errorText("text")
+                .build();
+        Mockito.when(service.addProduct(request)).thenReturn(response);
 
-        Assertions.assertThrows(ServletException.class, () -> mockMvc.perform(MockMvcRequestBuilders.post("/product/add").header("role", "ADMIN").content(objectMapper.writeValueAsString(request)).contentType(MediaType.APPLICATION_JSON)));
+        mockMvc.perform(MockMvcRequestBuilders.post("/product/add").header("role", "ADMIN").content(objectMapper.writeValueAsString(request)).contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(content().json(objectMapper.writeValueAsString(response)));
     }
 
     @Test
     void whenRequestUpdateProductSuccess() throws Exception {
         UpdateProductRequest request = new UpdateProductRequest(1L, "a.jpeg", "title", "description", "subtitle", 1L, "type", "measure", "unit", true);
-        UpdateProductResponse response = new UpdateProductResponse(true);
+        UpdateProductResponse response = UpdateProductResponse.builder().success(true).build();
         Mockito.when(service.updateProduct(request)).thenReturn(response);
 
         mockMvc.perform(MockMvcRequestBuilders.post("/product/update").header("role", "ADMIN").content(objectMapper.writeValueAsString(request)).contentType(MediaType.APPLICATION_JSON))
@@ -136,8 +167,6 @@ public class ProductControllerTest {
     @Test
     void whenRequestUpdateProductWithoutHeaderFail() throws Exception {
         UpdateProductRequest request = new UpdateProductRequest(1L, "a.jpeg", "title", "description", "subtitle", 1L, "type", "measure", "unit", true);
-        UpdateProductResponse response = new UpdateProductResponse(true);
-        Mockito.when(service.updateProduct(request)).thenReturn(response);
 
         mockMvc.perform(MockMvcRequestBuilders.post("/product/update").header("role", "USER").content(objectMapper.writeValueAsString(request)).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().is4xxClientError());
@@ -149,15 +178,23 @@ public class ProductControllerTest {
     @Test
     void whenRequestUpdateProductFail() throws Exception {
         UpdateProductRequest request = new UpdateProductRequest(1L, "a.jpeg", "title", "description", "subtitle", 1L, "type", "measure", "unit", true);
-        Mockito.when(service.updateProduct(request)).thenThrow(RuntimeException.class);
+        UpdateProductResponse response = UpdateProductResponse.builder()
+                .success(false)
+                .errorCode("code")
+                .errorText("text")
+                .build();
 
-        Assertions.assertThrows(ServletException.class, () -> mockMvc.perform(MockMvcRequestBuilders.post("/product/update").header("role", "ADMIN").content(objectMapper.writeValueAsString(request)).contentType(MediaType.APPLICATION_JSON)));
+        Mockito.when(service.updateProduct(request)).thenReturn(response);
+
+        mockMvc.perform(MockMvcRequestBuilders.post("/product/update").header("role", "ADMIN").content(objectMapper.writeValueAsString(request)).contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(content().json(objectMapper.writeValueAsString(response)));
     }
 
     @Test
     void whenRequestChangeProductAvailableSuccess() throws Exception {
         ChangeProductAvailableRequest request = new ChangeProductAvailableRequest(1L, true);
-        ChangeProductAvailableResponse response = new ChangeProductAvailableResponse(true);
+        ChangeProductAvailableResponse response = ChangeProductAvailableResponse.builder().success(true).build();
         Mockito.when(service.changeProductAvailable(request)).thenReturn(response);
 
         mockMvc.perform(MockMvcRequestBuilders.post("/product/available/change").header("role", "ADMIN").content(objectMapper.writeValueAsString(request)).contentType(MediaType.APPLICATION_JSON))
@@ -168,8 +205,6 @@ public class ProductControllerTest {
     @Test
     void whenRequestChangeProductAvailableWithoutHeaderFail() throws Exception {
         ChangeProductAvailableRequest request = new ChangeProductAvailableRequest(1L, true);
-        ChangeProductAvailableResponse response = new ChangeProductAvailableResponse(true);
-        Mockito.when(service.changeProductAvailable(request)).thenReturn(response);
 
         mockMvc.perform(MockMvcRequestBuilders.post("/product/available/change").header("role", "USER").content(objectMapper.writeValueAsString(request)).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().is4xxClientError());
@@ -181,17 +216,26 @@ public class ProductControllerTest {
     @Test
     void whenRequestChangeProductAvailableFail() throws Exception {
         ChangeProductAvailableRequest request = new ChangeProductAvailableRequest(1L, true);
-        Mockito.when(service.changeProductAvailable(request)).thenThrow(RuntimeException.class);
+        ChangeProductAvailableResponse response = ChangeProductAvailableResponse.builder()
+                .success(false)
+                .errorCode("code")
+                .errorText("text")
+                .build();
 
-        Assertions.assertThrows(ServletException.class, () -> mockMvc.perform(MockMvcRequestBuilders.post("/product/available/change").header("role", "ADMIN").content(objectMapper.writeValueAsString(request)).contentType(MediaType.APPLICATION_JSON)));
+        Mockito.when(service.changeProductAvailable(request)).thenReturn(response);
+
+        mockMvc.perform(MockMvcRequestBuilders.post("/product/available/change").header("role", "ADMIN").content(objectMapper.writeValueAsString(request)).contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(content().json(objectMapper.writeValueAsString(response)));
     }
 
     @Test
     void whenRequestAddReviewSuccess() throws Exception {
         Long userId = 1L;
+        String role = "USER";
         AddReviewRequest request = new AddReviewRequest(1L, "review");
-        AddReviewResponse response = new AddReviewResponse(true);
-        Mockito.when(service.addReview(request, userId)).thenReturn(response);
+        AddReviewResponse response = AddReviewResponse.builder().success(true).build();
+        Mockito.when(service.addReview(request, userId, role)).thenReturn(response);
 
         mockMvc.perform(MockMvcRequestBuilders.post("/product/review/add").header("role", "USER").header("userId", 1L).content(objectMapper.writeValueAsString(request)).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
@@ -200,10 +244,7 @@ public class ProductControllerTest {
 
     @Test
     void whenRequestAddReviewWithoutHeaderFail() throws Exception {
-        Long userId = 1L;
         AddReviewRequest request = new AddReviewRequest(1L, "review");
-        AddReviewResponse response = new AddReviewResponse(true);
-        Mockito.when(service.addReview(request, userId)).thenReturn(response);
 
         mockMvc.perform(MockMvcRequestBuilders.post("/product/review/add").header("role", "ADMIN").header("userId", 1L).content(objectMapper.writeValueAsString(request)).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().is4xxClientError());
@@ -215,18 +256,27 @@ public class ProductControllerTest {
     @Test
     void whenRequestAddReviewFail() throws Exception {
         Long userId = 1L;
+        String role = "USER";
         AddReviewRequest request = new AddReviewRequest(1L, "review");
-        Mockito.when(service.addReview(request, userId)).thenThrow(RuntimeException.class);
+        AddReviewResponse response = AddReviewResponse.builder()
+                .success(false)
+                .errorCode("code")
+                .errorText("text")
+                .build();
+        Mockito.when(service.addReview(request, userId, role)).thenReturn(response);
 
-        Assertions.assertThrows(ServletException.class, () -> mockMvc.perform(MockMvcRequestBuilders.post("/product/review/add").header("role", "USER").header("userId", 1L).content(objectMapper.writeValueAsString(request)).contentType(MediaType.APPLICATION_JSON)));
+        mockMvc.perform(MockMvcRequestBuilders.post("/product/review/add").header("role", "USER").header("userId", 1L).content(objectMapper.writeValueAsString(request)).contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(content().json(objectMapper.writeValueAsString(response)));
     }
 
     @Test
     void whenRequestAddRatingSuccess() throws Exception {
         Long userId = 1L;
+        String role = "USER";
         AddRatingRequest request = new AddRatingRequest(1L, 1L);
-        AddRatingResponse response = new AddRatingResponse(true);
-        Mockito.when(service.addRating(request, userId)).thenReturn(response);
+        AddRatingResponse response = AddRatingResponse.builder().success(true).build();
+        Mockito.when(service.addRating(request, userId, role)).thenReturn(response);
 
         mockMvc.perform(MockMvcRequestBuilders.post("/product/rating/add").header("role", "USER").header("userId", 1L).content(objectMapper.writeValueAsString(request)).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
@@ -237,8 +287,6 @@ public class ProductControllerTest {
     void whenRequestAddRatingWithoutHeaderFail() throws Exception {
         Long userId = 1L;
         AddRatingRequest request = new AddRatingRequest(1L, 1L);
-        AddRatingResponse response = new AddRatingResponse(true);
-        Mockito.when(service.addRating(request, userId)).thenReturn(response);
 
         mockMvc.perform(MockMvcRequestBuilders.post("/product/rating/add").header("role", "ADMIN").header("userId", 1L).content(objectMapper.writeValueAsString(request)).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().is4xxClientError());
@@ -250,10 +298,17 @@ public class ProductControllerTest {
     @Test
     void whenRequestAddRatingFail() throws Exception {
         Long userId = 1L;
+        String role = "USER";
         AddRatingRequest request = new AddRatingRequest(1L, 1L);
-        Mockito.when(service.addRating(request, userId)).thenThrow(RuntimeException.class);
+        AddRatingResponse response = AddRatingResponse.builder()
+                .success(false)
+                .errorCode("code")
+                .errorText("text")
+                .build();
+        Mockito.when(service.addRating(request, userId, role)).thenReturn(response);
 
-        Assertions.assertThrows(ServletException.class, () -> mockMvc.perform(MockMvcRequestBuilders.post("/product/rating/add").header("role", "USER").header("userId", 1L).content(objectMapper.writeValueAsString(request)).contentType(MediaType.APPLICATION_JSON)));
-    }
+        mockMvc.perform(MockMvcRequestBuilders.post("/product/rating/add").header("role", "USER").header("userId", 1L).content(objectMapper.writeValueAsString(request)).contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(content().json(objectMapper.writeValueAsString(response)));    }
 
 }
