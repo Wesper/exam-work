@@ -23,6 +23,7 @@
         <module>product-mplace-service</module>
         <module>profile-service</module>
         <module>order-service</module>
+        <module>static-server</module>
     </modules>
 
 </project>
