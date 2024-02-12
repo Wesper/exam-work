@@ -108,7 +108,7 @@ public class BasketServiceTest {
     @Test
     void whenDeleteProductFail() {
         Mockito.when(basketRepository.existsBasketEntityByProductIdAndUserId(1L, 1L)).thenReturn(true);
-        Mockito.when(basketRepository.deleteByProductIdAndUserId(1L, 1L)).thenReturn(2);
+        Mockito.when(basketRepository.deleteByProductIdAndUserId(1L, 1L)).thenReturn(0);
 
         DeleteProductResponse rs = basketService.deleteProduct(new DeleteProductRequest(1L), 1L);
         Assertions.assertAll(

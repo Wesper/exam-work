@@ -3,6 +3,7 @@ package ru.candle.store.orderservice.service.impl;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.candle.store.orderservice.dictionary.ExceptionCode;
 import ru.candle.store.orderservice.dto.Product;
 import ru.candle.store.orderservice.dto.request.basket.AddProductRequest;
@@ -21,11 +22,14 @@ import ru.candle.store.orderservice.service.IBasketService;
 import ru.candle.store.orderservice.service.IIntegrationService;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
 
 @Slf4j
 @Service
+@Transactional
 public class BasketServiceImpl implements IBasketService {
 
     @Autowired
@@ -42,18 +46,18 @@ public class BasketServiceImpl implements IBasketService {
         try {
             return addProductResponse(rq, userId, role);
         } catch (OrderException e) {
-            log.error(e.getMessage());
+            log.error(e.getMessage(), e);
             return AddProductResponse.builder()
                     .success(false)
                     .errorCode(e.getE().getErrorCode())
                     .errorText(e.getE().getErrorText())
                     .build();
         } catch (Exception e) {
-            log.error(e.getMessage());
+            log.error(e.getMessage(), e);
             return AddProductResponse.builder()
                     .success(false)
                     .errorCode(ExceptionCode.UNKNOWN_EXCEPTION.getErrorCode())
-                    .errorText(ExceptionCode.UNKNOWN_EXCEPTION.getErrorCode())
+                    .errorText(ExceptionCode.UNKNOWN_EXCEPTION.getErrorText())
                     .build();
         }
     }
@@ -63,18 +67,18 @@ public class BasketServiceImpl implements IBasketService {
         try {
             return deleteProductResponse(rq, userId);
         } catch (OrderException e) {
-            log.error(e.getMessage());
+            log.error(e.getMessage(), e);
             return DeleteProductResponse.builder()
                     .success(false)
                     .errorCode(e.getE().getErrorCode())
                     .errorText(e.getE().getErrorText())
                     .build();
         } catch (Exception e) {
-            log.error(e.getMessage());
+            log.error(e.getMessage(), e);
             return DeleteProductResponse.builder()
                     .success(false)
                     .errorCode(ExceptionCode.UNKNOWN_EXCEPTION.getErrorCode())
-                    .errorText(ExceptionCode.UNKNOWN_EXCEPTION.getErrorCode())
+                    .errorText(ExceptionCode.UNKNOWN_EXCEPTION.getErrorText())
                     .build();
         }
     }
@@ -84,18 +88,18 @@ public class BasketServiceImpl implements IBasketService {
         try {
             return changeCountProductResponse(rq, userId);
         } catch (OrderException e) {
-            log.error(e.getMessage());
+            log.error(e.getMessage(), e);
             return ChangeCountProductResponse.builder()
                     .success(false)
                     .errorCode(e.getE().getErrorCode())
                     .errorText(e.getE().getErrorText())
                     .build();
         } catch (Exception e) {
-            log.error(e.getMessage());
+            log.error(e.getMessage(), e);
             return ChangeCountProductResponse.builder()
                     .success(false)
                     .errorCode(ExceptionCode.UNKNOWN_EXCEPTION.getErrorCode())
-                    .errorText(ExceptionCode.UNKNOWN_EXCEPTION.getErrorCode())
+                    .errorText(ExceptionCode.UNKNOWN_EXCEPTION.getErrorText())
                     .build();
         }
     }
@@ -105,11 +109,11 @@ public class BasketServiceImpl implements IBasketService {
         try {
             return deleteAllProductResponse(userId);
         } catch (Exception e) {
-            log.error(e.getMessage());
+            log.error(e.getMessage(), e);
             return DeleteAllProductResponse.builder()
                     .success(false)
                     .errorCode(ExceptionCode.UNKNOWN_EXCEPTION.getErrorCode())
-                    .errorText(ExceptionCode.UNKNOWN_EXCEPTION.getErrorCode())
+                    .errorText(ExceptionCode.UNKNOWN_EXCEPTION.getErrorText())
                     .build();
         }
     }
@@ -119,18 +123,18 @@ public class BasketServiceImpl implements IBasketService {
         try {
             return getBasketResponse(userId, role);
         } catch (OrderException e) {
-            log.error(e.getMessage());
+            log.error(e.getMessage(), e);
             return GetBasketResponse.builder()
                     .success(false)
                     .errorCode(e.getE().getErrorCode())
                     .errorText(e.getE().getErrorText())
                     .build();
         } catch (Exception e) {
-            log.error(e.getMessage());
+            log.error(e.getMessage(), e);
             return GetBasketResponse.builder()
                     .success(false)
                     .errorCode(ExceptionCode.UNKNOWN_EXCEPTION.getErrorCode())
-                    .errorText(ExceptionCode.UNKNOWN_EXCEPTION.getErrorCode())
+                    .errorText(ExceptionCode.UNKNOWN_EXCEPTION.getErrorText())
                     .build();
         }
     }
@@ -140,18 +144,18 @@ public class BasketServiceImpl implements IBasketService {
         try {
             return applyPromocodeResponse(rq, userId, role);
         } catch (OrderException e) {
-            log.error(e.getMessage());
+            log.error(e.getMessage(), e);
             return ApplyPromocodeResponse.builder()
                     .success(false)
                     .errorCode(e.getE().getErrorCode())
                     .errorText(e.getE().getErrorText())
                     .build();
         } catch (Exception e) {
-            log.error(e.getMessage());
+            log.error(e.getMessage(), e);
             return ApplyPromocodeResponse.builder()
                     .success(false)
                     .errorCode(ExceptionCode.UNKNOWN_EXCEPTION.getErrorCode())
-                    .errorText(ExceptionCode.UNKNOWN_EXCEPTION.getErrorCode())
+                    .errorText(ExceptionCode.UNKNOWN_EXCEPTION.getErrorText())
                     .build();
         }
     }
@@ -173,7 +177,7 @@ public class BasketServiceImpl implements IBasketService {
             throw new OrderException(ExceptionCode.PRODUCT_NOT_FOUND, "У пользователя нет запрашиваемого продукта");
         }
         int countDeleteRows = basketRepository.deleteByProductIdAndUserId(rq.getProductId(), userId);
-        if (countDeleteRows != 1) {
+        if (countDeleteRows < 1) {
             throw new OrderException(ExceptionCode.DELETE_PRODUCT_ERROR, "Произошла ошибка при удалении продукта из корзины, количество затронутых строк " + countDeleteRows);
         }
         return DeleteProductResponse.builder().success(true).build();
@@ -201,11 +205,11 @@ public class BasketServiceImpl implements IBasketService {
         if (basketEntities.isEmpty()) {
             throw new OrderException(ExceptionCode.PRODUCT_NOT_FOUND, "У пользователя нет продуктов в корзине");
         }
-        List<Long> productIds = new ArrayList<>();
+        Set<Long> productIds = new HashSet<>();
         basketEntities.forEach(basketEntity -> {
             productIds.add(basketEntity.getProductId());
         });
-        GetProductsInfoResponse productsInfo = integrationService.getProductInfoByIds(productIds, role);
+        GetProductsInfoResponse productsInfo = integrationService.getProductInfoByIds(new ArrayList<>(productIds), role);
         if (productsInfo.getProductsInfo().isEmpty() || productsInfo.getProductsInfo().size() != productIds.size()) {
             throw new OrderException(ExceptionCode.GET_PRODUCTS_INFO_NOT_COMPLETE, "Получена не вся информация о продуктах");
         }

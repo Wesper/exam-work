@@ -1,0 +1,122 @@
+<html lang="ru" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Домашняя страница</title>
+    <link rel="stylesheet" th:href="@{/css/bootstrap.min.css}">
+    <link rel="stylesheet" th:href="@{/css/bootstrap-icons.css}">
+    <link rel="stylesheet" th:href="@{/css/all.min.css}">
+    <script th:src="@{/js/bootstrap.bundle.min.js}"></script>
+    <script th:src="@{/js/jquery-3.7.1.js}"></script>
+    <script th:src="@{/js/custom.js}"></script>
+</head>
+<body>
+
+<th:block th:include="fragments/header.html"></th:block>
+
+<div>
+    <br>
+</div>
+
+<section class="py-5">
+    <div class="container">
+        <div class="row gx-5">
+            <aside class="col-lg-6">
+                <div class="mb-3 d-flex justify-content-center">
+                    <img style="max-width: 100%; max-height: 30vw; margin: auto;" class="rounded-4 fit"
+                         th:src="${minioHost + product.imageId}"/>
+                </div>
+            </aside>
+            <main class="col-lg-6">
+                <div class="ps-lg-3">
+                    <h4 class="title text-dark" th:text="${product.title}">
+                    </h4>
+                    <div class="d-flex flex-row my-3">
+                        <div class="text-dark mb-1 me-2">
+                            <span>Оценка </span>
+                            <span class="ms-1" th:text="${#strings.substring(product.rating,0,3)}"></span>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <span class="h5" th:text="${product.price + ' ₽ '}"></span>
+                        <span class="text-muted" th:text="${'/ ' + product.measure}"></span>
+                        <span class="text-muted" th:text="${' ' + product.unitMeasure}"></span>
+                    </div>
+
+                    <p th:text="${product.description}">
+                    </p>
+
+                    <hr/>
+                    <a th:if="${role.equals('USER') || role.equals('')}" class="btn btn-light shadow-0" th:href="@{/basket/add/{productId}(productId=${product.productId})}"> Добавить в корзину </a>
+                </div>
+            </main>
+        </div>
+    </div>
+</section>
+
+<section class="bg-light border-top py-4">
+    <div class="container">
+        <div class="row gx-4">
+            <div class="col-lg-8 mb-4">
+                <div class="border rounded-2 px-3 py-2 bg-white">
+                    <div class="tab-content" id="ex1-content">
+                        <div class="tab-pane fade show active" id="ex1-pills-1" role="tabpanel"
+                             aria-labelledby="ex1-tab-1">
+                            <h5>Отзывы</h5>
+                            <br>
+                            <ul th:each="rev : ${product.review}">
+                                <li class="list-item" th:text="${rev.review}">
+                                </li>
+                            </ul>
+                            <span th:if="${product.review.size == 0}">Пока еще никто не оставил отзыв</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-4" th:if="${role.equals('USER')}">
+                <div class="px-0 border rounded-2 shadow-0">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">Оценить</h5>
+                            <div class="d-flex mb-3">
+                                <form role="form" method="post" th:action="@{/rating/add}" th:if="${product.appreciated == false && isPurchased == true}">
+                                    <div class="form-group">
+                                        <label for="rating">
+                                        </label>
+                                        <input type="number" min="1" max="5" class="form-control" id="rating" name="rating"/>
+                                        <input type="hidden" name="productId" th:value="${product.productId}">
+                                    </div>
+                                    <button type="submit" class="btn btn-light">
+                                        Оценить
+                                    </button>
+                                </form>
+                                <p th:if="${isPurchased == false}">Вы сможете оставить оценку после приобретения продукта</p>
+                                <p th:if="${product.appreciated == true}">Вы уже оценили продукт</p>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <h5 class="card-title">Оставить отзыв</h5>
+                            <div class="d-flex mb-3">
+                                <form role="form" method="post" th:action="@{/review/add}" th:if="${isPurchased == true}">
+                                    <div class="form-group">
+                                        <label for="review">
+                                        </label>
+                                        <input type="text" minlength="1" class="form-control" id="review" name="review"/>
+                                        <input type="hidden" name="productId" th:value="${product.productId}">
+                                    </div>
+                                    <button type="submit" class="btn btn-light">
+                                        Отправить отзыв
+                                    </button>
+                                </form>
+                                <p th:if="${isPurchased == false}">Вы сможете оставить отзыв после приобретения продукта</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+
+</body>
+</html>

@@ -21,7 +21,7 @@ public interface IOrderService {
      * @param role роль пользователя
      * @return информация о заказе
      */
-    GetOrderResponse getOrder(GetOrderRequest rq, Long userId, String role);
+    GetOrderResponse getOrder(GetOrderRequest rq, Long userId, String role, Boolean filterByUser);
 
     /**
      * Изменение статуса заказа
@@ -49,5 +49,5 @@ public interface IOrderService {
      * @param rq запрос
      * @return признак приобретения
      */
-    IsUserPurchasedProductResponse isUserPurchasedProduct(IsUserPurchasedProductRequest rq);
+    IsUserPurchasedProductResponse isUserPurchasedProduct(IsUserPurchasedProductRequest rq, String userId);
 }

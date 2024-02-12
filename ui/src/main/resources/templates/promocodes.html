@@ -1,0 +1,91 @@
+<html lang="ru" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Управление статикой</title>
+    <link rel="stylesheet" th:href="@{/css/bootstrap.min.css}">
+    <link rel="stylesheet" th:href="@{/css/bootstrap-icons.css}">
+    <link rel="stylesheet" th:href="@{/css/all.min.css}">
+    <script th:src="@{/js/bootstrap.bundle.min.js}"></script>
+    <script th:src="@{/js/jquery-3.7.1.js}"></script>
+    <script th:src="@{/js/custom.js}"></script>
+</head>
+<body>
+
+<th:block th:include="fragments/header.html"></th:block>
+
+<div>
+    <br>
+</div>
+
+<div class="d-flex align-items-center justify-content-center vh-100" th:if="${promocodeIsEmpty != null}">
+    <div class="text-center">
+        <p class="fs-3"> <span class="text-danger">Хммм..</span> Кажется, вы еще не добавили промокоды.</p>
+    </div>
+</div>
+
+<table class="table align-middle mb-0 bg-white">
+    <thead class="bg-light">
+    <tr>
+        <th>Промокод</th>
+        <th>Скидка %</th>
+        <th>Актуальность</th>
+        <th>Действия</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="promocode : ${promocodes}">
+        <td>
+            <p class="fw-normal mb-1" th:text="${promocode.promocode}"></p>
+        </td>
+        <td>
+            <p class="fw-normal mb-1" th:text="${promocode.percent}"></p>
+        </td>
+        <td>
+            <p class="fw-normal mb-1" th:text="${promocode.actual}"></p>
+        </td>
+        <td>
+            <a th:href="@{/admin/promocodes/change/available(promocode=${promocode.promocode}, actual=${!promocode.actual})}">
+                <button type="button" class="btn btn btn-outline-dark">
+                    Изменить актуальность
+                </button>
+            </a>
+        </td>
+    </tr>
+    </tbody>
+</table>
+
+<hr>
+<div class="w-100 p-2">
+    <form id="signin" method="post" th:action="@{./add}">
+        <div class="row gy-3 overflow-hidden">
+            <div class="col-4">
+                <div class="form-floating mb-3">
+                    <input type="text" class="form-control" name="promocode" id="promocode" placeholder="promocode" required>
+                    <label for="promocode">Промокод</label>
+                </div>
+            </div>
+            <div class="col-4">
+                <div class="form-floating mb-3">
+                    <input type="text" class="form-control" name="percent" id="percent" placeholder="percent" required>
+                    <label for="percent">Скидка %</label>
+                </div>
+            </div>
+            <div class="col-4">
+                <div class="form-floating mb-3">
+                    <select class="form-select" id="actual" name="actual">
+                        <option selected>true</option>
+                        <option value="1">false</option>
+                    </select>
+                    <label for="actual">Актуальность</label>
+                </div>
+            </div>
+            <div class="col-3">
+                <div class="d-grid">
+                    <button class="btn btn-dark btn-lg" type="submit">Добавить продукт</button>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+
+</body>
+</html>

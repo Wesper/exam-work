@@ -37,7 +37,7 @@ public class PromocodeController {
      * @param role роль пользователя
      * @return информация о промокоде
      */
-    @PreAuthorize("#role == 'USER'")
+    @PreAuthorize("#role == 'USER' || #role == 'ADMIN' || #role == 'MANAGER'")
     @GetMapping(value = "/get/{promocode}")
     public GetPromocodeResponse getPromocode(@PathVariable("promocode") String promocode, @RequestHeader("role") String role) {
         return service.getPromocode(promocode);

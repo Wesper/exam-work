@@ -30,7 +30,7 @@ public class JwtServiceTest {
                 "One",
                 "OnePass",
                 "one@one.ru",
-                Role.ROLE_USER
+                Role.USER
         );
         String token = service.generateToken(user);
         Assertions.assertEquals("One", service.extractUsername(token));
@@ -48,7 +48,7 @@ public class JwtServiceTest {
                 "One",
                 "OnePass",
                 "one@one.ru",
-                Role.ROLE_USER
+                Role.USER
         );
         String token = service.generateToken(user);
 
@@ -69,7 +69,7 @@ public class JwtServiceTest {
                 "One",
                 "OnePass",
                 "one@one.ru",
-                Role.ROLE_USER
+                Role.USER
         );
 
         String token = service.generateToken(expectedUser);

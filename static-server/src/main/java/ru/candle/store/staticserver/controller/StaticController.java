@@ -34,7 +34,7 @@ public class StaticController {
      */
     @PreAuthorize("#role == 'ADMIN'")
     @PostMapping(value = "/upload")
-    public UploadImageResponse uploadImage(@RequestHeader("role") String role, @ModelAttribute Image request) {
+    public UploadImageResponse uploadImage(@RequestHeader("role") String role, @RequestBody Image request) {
         return service.uploadImage(request);
     }
 

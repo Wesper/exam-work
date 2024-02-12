@@ -149,7 +149,7 @@ public class BasketControllerTest {
         DeleteAllProductResponse rs = DeleteAllProductResponse.builder().success(true).build();
         Mockito.when(service.deleteAllProduct(1L)).thenReturn(rs);
 
-        mockMvc.perform(MockMvcRequestBuilders.post("/basket/clear").header("role", "USER").header("userId", 1L).content("{}").contentType(MediaType.APPLICATION_JSON))
+        mockMvc.perform(MockMvcRequestBuilders.get("/basket/clear").header("role", "USER").header("userId", 1L).content("{}").contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().json(objectMapper.writeValueAsString(rs)));
     }
@@ -169,7 +169,7 @@ public class BasketControllerTest {
                 .build();
         Mockito.when(service.deleteAllProduct(1L)).thenReturn(rs);
 
-        mockMvc.perform(MockMvcRequestBuilders.post("/basket/clear").header("role", "USER").header("userId", 1L).content("{}").contentType(MediaType.APPLICATION_JSON))
+        mockMvc.perform(MockMvcRequestBuilders.get("/basket/clear").header("role", "USER").header("userId", 1L).content("{}").contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().json(objectMapper.writeValueAsString(rs)));
     }

@@ -31,7 +31,7 @@ public class PromocodeServiceImpl implements IPromocodeService {
         try {
             return addPromocodeResponse(rq);
         } catch (Exception e) {
-            log.error(e.getMessage());
+            log.error(e.getMessage(), e);
             return AddPromocodeResponse.builder()
                     .success(false)
                     .errorCode(ExceptionCode.UNKNOWN_EXCEPTION.getErrorCode())
@@ -45,14 +45,14 @@ public class PromocodeServiceImpl implements IPromocodeService {
         try {
             return getPromocodeResponse(promocode);
         } catch (OrderException e) {
-            log.error(e.getMessage());
+            log.error(e.getMessage(), e);
             return GetPromocodeResponse.builder()
                     .success(false)
                     .errorCode(e.getE().getErrorCode())
                     .errorText(e.getE().getErrorText())
                     .build();
         } catch (Exception e) {
-            log.error(e.getMessage());
+            log.error(e.getMessage(), e);
             return GetPromocodeResponse.builder()
                     .success(false)
                     .errorCode(ExceptionCode.UNKNOWN_EXCEPTION.getErrorCode())
@@ -66,14 +66,14 @@ public class PromocodeServiceImpl implements IPromocodeService {
         try {
             return changePromocodeActualResponse(rq);
         } catch (OrderException e) {
-            log.error(e.getMessage());
+            log.error(e.getMessage(), e);
             return ChangePromocodeActualResponse.builder()
                     .success(false)
                     .errorCode(e.getE().getErrorCode())
                     .errorText(e.getE().getErrorText())
                     .build();
         } catch (Exception e) {
-            log.error(e.getMessage());
+            log.error(e.getMessage(), e);
             return ChangePromocodeActualResponse.builder()
                     .success(false)
                     .errorCode(ExceptionCode.UNKNOWN_EXCEPTION.getErrorCode())
@@ -93,7 +93,7 @@ public class PromocodeServiceImpl implements IPromocodeService {
                     .promocodes(new ArrayList<>())
                     .build();
         } catch (Exception e) {
-            log.error(e.getMessage());
+            log.error(e.getMessage(), e);
             return GetAllPromocodesResponse.builder()
                     .success(false)
                     .errorCode(ExceptionCode.UNKNOWN_EXCEPTION.getErrorCode())

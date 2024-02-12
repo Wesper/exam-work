@@ -85,19 +85,11 @@ public class ProductControllerTest {
                 .appreciated(true)
                 .review(null).
                 build();
-        Mockito.when(service.getProductCard(request, userId)).thenReturn(response);
+        Mockito.when(service.getProductCard(request)).thenReturn(response);
 
         mockMvc.perform(MockMvcRequestBuilders.post("/product/card").header("userId", 1L).content(objectMapper.writeValueAsString(request)).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().json(objectMapper.writeValueAsString(response)));
-    }
-
-    @Test
-    void whenRequestGetProductCardWithoutHeaderFail() throws Exception {
-        GetProductCardRequest request = new GetProductCardRequest(1L);
-
-        mockMvc.perform(MockMvcRequestBuilders.post("/product/card").content(objectMapper.writeValueAsString(request)).contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().is4xxClientError());
     }
 
     @Test
@@ -109,7 +101,7 @@ public class ProductControllerTest {
                 .errorCode("code")
                 .errorText("text")
                 .build();
-        Mockito.when(service.getProductCard(request, userId)).thenReturn(response);
+        Mockito.when(service.getProductCard(request)).thenReturn(response);
 
         mockMvc.perform(MockMvcRequestBuilders.post("/product/card").header("userId", 1L).content(objectMapper.writeValueAsString(request)).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
@@ -246,7 +238,7 @@ public class ProductControllerTest {
     void whenRequestAddReviewWithoutHeaderFail() throws Exception {
         AddReviewRequest request = new AddReviewRequest(1L, "review");
 
-        mockMvc.perform(MockMvcRequestBuilders.post("/product/review/add").header("role", "ADMIN").header("userId", 1L).content(objectMapper.writeValueAsString(request)).contentType(MediaType.APPLICATION_JSON))
+        mockMvc.perform(MockMvcRequestBuilders.post("/product/review/add").header("role", "ADMIN").content(objectMapper.writeValueAsString(request)).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().is4xxClientError());
 
         mockMvc.perform(MockMvcRequestBuilders.post("/product/review/add").content(objectMapper.writeValueAsString(request)).contentType(MediaType.APPLICATION_JSON))
@@ -288,7 +280,7 @@ public class ProductControllerTest {
         Long userId = 1L;
         AddRatingRequest request = new AddRatingRequest(1L, 1L);
 
-        mockMvc.perform(MockMvcRequestBuilders.post("/product/rating/add").header("role", "ADMIN").header("userId", 1L).content(objectMapper.writeValueAsString(request)).contentType(MediaType.APPLICATION_JSON))
+        mockMvc.perform(MockMvcRequestBuilders.post("/product/rating/add").header("role", "ADMIN").content(objectMapper.writeValueAsString(request)).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().is4xxClientError());
 
         mockMvc.perform(MockMvcRequestBuilders.post("/product/rating/add").content(objectMapper.writeValueAsString(request)).contentType(MediaType.APPLICATION_JSON))

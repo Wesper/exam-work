@@ -1,11 +1,12 @@
 package ru.candle.store.orderservice.entity;
 
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.NonNull;
 import org.hibernate.annotations.DynamicUpdate;
 import ru.candle.store.orderservice.dictionary.Status;
-
-import java.util.List;
 
 @Entity
 @Table(name = "orders")
@@ -17,6 +18,7 @@ public class OrderEntity {
 
     @Id
     @Column(name = "id")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Column(name = "user_id")
@@ -42,11 +44,11 @@ public class OrderEntity {
     private Long totalPromoPrice;
 
     @Column(name = "details")
-    @OneToMany
     @NonNull
-    private List<ProductEntity> details;
+    private String details;
 
     @Column(name = "status")
+    @Enumerated(EnumType.STRING)
     @NonNull
     private Status status;
 }

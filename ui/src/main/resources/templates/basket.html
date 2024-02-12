@@ -1,0 +1,128 @@
+<html lang="ru" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Корзина</title>
+    <link rel="stylesheet" th:href="@{/css/bootstrap.min.css}">
+    <link rel="stylesheet" th:href="@{/css/bootstrap-icons.css}">
+    <link rel="stylesheet" th:href="@{/css/all.min.css}">
+    <script th:src="@{/js/bootstrap.bundle.min.js}"></script>
+    <script th:src="@{/js/jquery-3.7.1.js}"></script>
+    <script th:src="@{/js/custom.js}"></script>
+</head>
+<body>
+
+<th:block th:include="fragments/header.html"></th:block>
+
+<div>
+    <br>
+</div>
+
+<div class="d-flex align-items-center justify-content-center vh-100" th:if="${productIsEmpty != null}">
+    <div class="text-center">
+        <p class="fs-3"><span class="text-danger">Хммм..</span> Кажется, вы еще не добавили продукты.</p>
+    </div>
+</div>
+
+<div class="row gy-3 overflow-hidden">
+    <table class="table align-middle mb-0 bg-white" th:if="${products != null}">
+        <thead class="bg-light">
+        <tr>
+            <th></th>
+            <th>Заголовок</th>
+            <th>Цена</th>
+            <th>Цена со скидкой</th>
+            <th>Количество</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="product : ${products}">
+            <td>
+                <div class="d-flex align-items-center">
+                    <img
+                            th:src="${minioHost + product.imageId}"
+                            alt=""
+                            style="width: 65px; height: 65px"
+                            class="rounded-circle"
+                    />
+                </div>
+            </td>
+            <td>
+                <p class="fw-normal mb-1" th:text="${product.title}"></p>
+            </td>
+            <td>
+                <p class="fw-normal mb-1" th:text="${product.price}"></p>
+            </td>
+            <td>
+                <p class="fw-normal mb-1" th:text="${product.promoPrice}"></p>
+            </td>
+            <td>
+                <p class="fw-normal mb-1" th:text="${product.count}"></p>
+            </td>
+            <td>
+                <a th:href="@{/basket/product/delete/{productId}(productId=${product.productId})}">
+                    <button type="button" class="btn btn btn-outline-dark">
+                        Удалить
+                    </button>
+                </a>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+
+<div class="row" th:if="${products != null}">
+    <div class="flex-box">
+        <div class="col-2 ms-auto">
+            <h5>Общая цена</h5>
+            <h6 th:text="${totalPrice + ' ₽'}"></h6>
+        </div>
+        <div class="col-2 ms-auto" th:if="${totalPromoPrice != null}">
+            <h5>Цена с учетом промокода</h5>
+            <h6 th:text="${totalPromoPrice + ' ₽'}"></h6>
+        </div>
+        <div class="col-2 ms-auto">
+            <a th:href="@{/basket/preorder(promocode=${promocode})}">
+                <button class="btn btn-outline-dark" type="button">Перейти к оформлению</button>
+            </a>
+        </div>
+    </div>
+</div>
+
+<hr>
+<div class="w-50 p-2" th:if="${products != null}">
+    <div class="row gy-3 overflow-hidden">
+        <div class="col-3">
+            <div class="d-grid">
+                <a th:href="@{/basket/clear}">
+                    <button class="btn btn-outline-dark" type="submit">Очистить корзину</button>
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="w-50 p-2" th:if="${products != null}">
+    <form id="promocodeApply" method="post" th:action="@{/basket/promocode/apply}">
+        <div class="row gy-3 overflow-hidden">
+            <div class="col-4">
+                <div class="form-floating mb-3">
+                    <input type="text" class="form-control" name="promocode" id="promocode" placeholder="promocode" th:value="${promocode}"
+                           required>
+                    <label for="promocode">Промокод</label>
+                </div>
+            </div>
+            <div class="col-4" th:if="${promocode == null}">
+                <div class="d-grid">
+                    <button class="btn btn-outline-dark" type="submit">Применить промокод</button>
+                </div>
+            </div>
+            <div class="col-4" th:if="${promocode != null}">
+                <a th:href="@{/basket}">
+                    <button class="btn btn-outline-dark" type="button">Отменить промокод</button>
+                </a>
+            </div>
+        </div>
+    </form>
+</div>
+
+</body>
+</html>

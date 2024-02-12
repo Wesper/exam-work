@@ -1,5 +1,6 @@
 package ru.candle.store.orderservice.config;
 
+import org.springframework.cloud.client.loadbalancer.LoadBalanced;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
@@ -15,6 +16,7 @@ import org.springframework.web.client.RestTemplate;
 public class OrderConfig {
 
     @Bean
+    @LoadBalanced
     RestTemplate restTemplate() {
         return new RestTemplate();
     }

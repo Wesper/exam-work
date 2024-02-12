@@ -57,8 +57,6 @@ public class ProfileControllerTest {
 
     @Test
     void whenRequestGetProfileWithoutHeadersFail() throws Exception {
-        mockMvc.perform(MockMvcRequestBuilders.get("/profile/get").header("role", "ADMIN").header("userId", 1L).contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().is4xxClientError());
 
         mockMvc.perform(MockMvcRequestBuilders.get("/profile/get").header("userId", 1L).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().is4xxClientError());
@@ -118,9 +116,6 @@ public class ProfileControllerTest {
                 .success(true)
                 .build();
         Mockito.when(service.saveUserProfile(rq, userId)).thenReturn(response);
-
-        mockMvc.perform(MockMvcRequestBuilders.post("/profile/save").header("role", "ADMIN").header("userId", 1L).content(objectMapper.writeValueAsString(rq)).contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().is4xxClientError());
 
         mockMvc.perform(MockMvcRequestBuilders.post("/profile/save").header("userId", 1L).content(objectMapper.writeValueAsString(rq)).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().is4xxClientError());

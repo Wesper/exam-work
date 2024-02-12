@@ -7,7 +7,6 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.springframework.web.multipart.MultipartFile;
 
 @Data
 @Builder
@@ -19,8 +18,9 @@ public class Image {
 
     private String title;
     private String description;
-    private MultipartFile file;
+    private byte[] file;
     private String url;
     private Long size;
     private String filename;
+    private String contentType;
 }

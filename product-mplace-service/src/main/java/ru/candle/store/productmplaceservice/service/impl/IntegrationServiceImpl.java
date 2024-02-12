@@ -24,6 +24,7 @@ public class IntegrationServiceImpl implements IIntegrationService {
         IsUserPurchasedProductRequest request = new IsUserPurchasedProductRequest(userId, productId);
         HttpHeaders headers = new HttpHeaders();
         headers.set("role", role);
+        headers.set("userId", String.valueOf(userId));
         HttpEntity<IsUserPurchasedProductRequest> entity = new HttpEntity<>(request, headers);
         IsUserPurchasedProductResponse response = restTemplate.postForObject("http://order-service/order/purchased", entity, IsUserPurchasedProductResponse.class);
         if (response != null && response.getSuccess().equals(true)) {

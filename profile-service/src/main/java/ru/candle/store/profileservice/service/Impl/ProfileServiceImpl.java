@@ -27,7 +27,7 @@ public class ProfileServiceImpl implements IProfileService {
             log.warn(e.getMessage());
             return GetProfileResponse.builder().success(true).build();
         } catch (Exception e) {
-            log.error(e.getMessage());
+            log.error(e.getMessage(), e);
             return GetProfileResponse.builder()
                     .success(false)
                     .errorCode(ExceptionCode.UNKNOWN_EXCEPTION.getErrorCode())
@@ -41,7 +41,7 @@ public class ProfileServiceImpl implements IProfileService {
         try {
             return saveProfile(rq, userId);
         } catch (Exception e) {
-            log.error(e.getMessage());
+            log.error(e.getMessage(), e);
             return SaveProfileResponse.builder()
                     .success(false)
                     .errorCode(ExceptionCode.UNKNOWN_EXCEPTION.getErrorCode())

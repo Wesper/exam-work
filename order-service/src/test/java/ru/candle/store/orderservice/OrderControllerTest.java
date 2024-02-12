@@ -99,7 +99,7 @@ OrderControllerTest {
                 .products(products)
                 .status(Status.NEW)
                 .build();
-        Mockito.when(service.getOrder(rq, 1L, "USER")).thenReturn(rs);
+        Mockito.when(service.getOrder(rq, 1L, "USER", true)).thenReturn(rs);
 
         mockMvc.perform(MockMvcRequestBuilders.post("/order/get").header("role", "USER")
                         .header("userId", 1L).content(objectMapper.writeValueAsString(rq)).contentType(MediaType.APPLICATION_JSON))
@@ -119,7 +119,7 @@ OrderControllerTest {
                 .errorCode(ExceptionCode.PRODUCT_NOT_FOUND.getErrorCode())
                 .errorText(ExceptionCode.PRODUCT_NOT_FOUND.getErrorText())
                 .build();
-        Mockito.when(service.getOrder(rq, 1L, "USER")).thenReturn(rs);
+        Mockito.when(service.getOrder(rq, 1L, "USER", true)).thenReturn(rs);
 
 
         mockMvc.perform(MockMvcRequestBuilders.post("/order/get").header("role", "USER")
