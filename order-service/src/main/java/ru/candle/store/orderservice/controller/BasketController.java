@@ -1,5 +1,6 @@
 package ru.candle.store.orderservice.controller;
 
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -25,9 +26,10 @@ public class BasketController {
      * @param userId идентификатор пользователя
      * @return true или false
      */
-    @PreAuthorize("#role == 'USER'")
+    @PreAuthorize("#role == 'USER' || #role == 'ADMIN' || #role == 'MANAGER'")
     @PostMapping(value = "/add")
-    public AddProductResponse addProduct(@RequestBody @Valid AddProductRequest rq, @RequestHeader("role") String role, @RequestHeader("userId") Long userId) {
+    public AddProductResponse addProduct(@RequestBody @Valid AddProductRequest rq, @RequestHeader("role") String role,
+                                         @RequestHeader("userId") Long userId, HttpServletRequest servletRequest) {
         return service.addProduct(rq, userId, role);
     }
 
@@ -38,7 +40,7 @@ public class BasketController {
      * @param userId идентификатор пользователя
      * @return true или false
      */
-    @PreAuthorize("#role == 'USER'")
+    @PreAuthorize("#role == 'USER' || #role == 'ADMIN' || #role == 'MANAGER'")
     @PostMapping(value = "/delete")
     public DeleteProductResponse deleteProduct(@RequestBody @Valid DeleteProductRequest rq, @RequestHeader("role") String role, @RequestHeader("userId") Long userId) {
         return service.deleteProduct(rq, userId);
@@ -51,7 +53,7 @@ public class BasketController {
      * @param userId идентификатор пользователя
      * @return true или false
      */
-    @PreAuthorize("#role == 'USER'")
+    @PreAuthorize("#role == 'USER' || #role == 'ADMIN' || #role == 'MANAGER'")
     @PostMapping(value = "/product/count/change")
     public ChangeCountProductResponse changeCountProduct(@RequestBody @Valid ChangeCountProductRequest rq, @RequestHeader("role") String role, @RequestHeader("userId") Long userId) {
         return service.changeCountProduct(rq, userId);
@@ -63,8 +65,8 @@ public class BasketController {
      * @param userId идентификатор пользователя
      * @return true или false
      */
-    @PreAuthorize("#role == 'USER'")
-    @PostMapping(value = "/clear")
+    @PreAuthorize("#role == 'USER' || #role == 'ADMIN' || #role == 'MANAGER'")
+    @GetMapping(value = "/clear")
     public DeleteAllProductResponse deleteAllProduct(@RequestHeader("role") String role, @RequestHeader("userId") Long userId) {
         return service.deleteAllProduct(userId);
     }
@@ -75,7 +77,7 @@ public class BasketController {
      * @param userId идентификатор пользователя
      * @return список продуктов
      */
-    @PreAuthorize("#role == 'USER'")
+    @PreAuthorize("#role == 'USER' || #role == 'ADMIN' || #role == 'MANAGER'")
     @GetMapping(value = "/get")
     public GetBasketResponse getBasket(@RequestHeader("role") String role, @RequestHeader("userId") Long userId) {
         return service.getBasket(userId, role);
@@ -88,7 +90,7 @@ public class BasketController {
      * @param userId идентификатор пользователя
      * @return список продуктов с учетом промокода
      */
-    @PreAuthorize("#role == 'USER'")
+    @PreAuthorize("#role == 'USER' || #role == 'ADMIN' || #role == 'MANAGER'")
     @PostMapping(value = "/promocode/apply")
     public ApplyPromocodeResponse applyPromocode(@RequestBody @Valid ApplyPromocodeRequest rq, @RequestHeader("role") String role, @RequestHeader("userId") Long userId) {
         return service.applyPromocode(rq, userId, role);

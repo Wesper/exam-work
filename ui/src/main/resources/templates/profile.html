@@ -1,0 +1,72 @@
+<html lang="ru" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Управление продуктами</title>
+    <link rel="stylesheet" th:href="@{/css/bootstrap.min.css}">
+    <link rel="stylesheet" th:href="@{/css/bootstrap-icons.css}">
+    <link rel="stylesheet" th:href="@{/css/all.min.css}">
+    <script th:src="@{/js/bootstrap.bundle.min.js}"></script>
+    <script th:src="@{/js/jquery-3.7.1.js}"></script>
+    <script th:src="@{/js/custom.js}"></script>
+</head>
+<body>
+
+<th:block th:include="fragments/header.html"></th:block>
+
+<div>
+    <br>
+</div>
+
+<div class="w-100 p-5 y-5">
+    <div>
+        <h1>Профиль</h1>
+    </div>
+    <form id="signin" method="post" th:action="@{/profile/save}">
+        <div class="gy-3 overflow-hidden">
+            <div class="col-4">
+                <div class="form-floating mb-3">
+                    <input type="text" class="form-control" name="lastName" id="lastName" th:value="${lastName}" required>
+                    <label for="lastName">Фамилия</label>
+                </div>
+            </div>
+            <div class="col-4">
+                <div class="form-floating mb-3">
+                    <input type="text" class="form-control" name="firstName" id="firstName" th:value="${firstName}" required>
+                    <label for="firstName">Имя</label>
+                </div>
+            </div>
+            <div class="col-4">
+                <div class="form-floating mb-3">
+                    <input type="text" class="form-control" name="middleName" id="middleName" th:value="${middleName}" >
+                    <label for="middleName">Отчество</label>
+                </div>
+            </div>
+            <div class="col-4">
+                <div class="form-floating mb-3">
+                    <input type="date" class="form-control" name="birthday" id="birthday" th:value="${birthday}" required>
+                    <label for="birthday">Дата рождения</label>
+                </div>
+            </div>
+            <div class="col-4">
+                <div class="form-floating mb-3">
+                    <input type="text" class="form-control" name="city" id="city" th:value="${city}" >
+                    <label for="city">Город</label>
+                </div>
+            </div>
+            <div class="col-4">
+                <div class="form-floating mb-3">
+                    <input type="text" class="form-control" name="address" id="address" th:value="${address}" required>
+                    <label for="address">Адрес</label>
+                </div>
+            </div>
+
+            <div class="col-3">
+                <div class="d-grid">
+                    <button class="btn btn-dark btn-lg" type="submit">Сохранить</button>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+
+</body>
+</html>

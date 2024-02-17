@@ -53,7 +53,7 @@ public class ProductServiceImpl implements IProductService, ITransactionalServic
                     .products(new ArrayList<>())
                     .build();
         } catch (Exception e) {
-            log.error(e.getMessage());
+            log.error(e.getMessage(), e);
             return GetAllProductsResponse.builder()
                     .success(false)
                     .errorCode(ExceptionCode.UNKNOWN_EXCEPTION.getErrorCode())
@@ -63,18 +63,18 @@ public class ProductServiceImpl implements IProductService, ITransactionalServic
     }
 
     @Override
-    public GetProductCardResponse getProductCard(GetProductCardRequest rq, Long userId) {
+    public GetProductCardResponse getProductCard(GetProductCardRequest rq) {
         try {
-            return getProductCardResponse(rq, userId);
+            return getProductCardResponse(rq);
         } catch (ProductMplaceException e) {
-            log.error(e.getMessage());
+            log.error(e.getMessage(), e);
             return GetProductCardResponse.builder()
                     .success(false)
                     .errorCode(e.getE().getErrorCode())
                     .errorText(e.getE().getErrorText())
                     .build();
         } catch (Exception e) {
-            log.error(e.getMessage());
+            log.error(e.getMessage(), e);
             return GetProductCardResponse.builder()
                     .success(false)
                     .errorCode(ExceptionCode.UNKNOWN_EXCEPTION.getErrorCode())
@@ -88,7 +88,7 @@ public class ProductServiceImpl implements IProductService, ITransactionalServic
         try {
             return addProductResponse(rq);
         } catch (Exception e) {
-            log.error(e.getMessage());
+            log.error(e.getMessage(), e);
             return AddProductResponse.builder()
                     .success(false)
                     .errorCode(ExceptionCode.UNKNOWN_EXCEPTION.getErrorCode())
@@ -102,7 +102,7 @@ public class ProductServiceImpl implements IProductService, ITransactionalServic
         try {
             return updateProductResponse(rq);
         } catch (Exception e) {
-            log.error(e.getMessage());
+            log.error(e.getMessage(), e);
             return UpdateProductResponse.builder()
                     .success(false)
                     .errorCode(ExceptionCode.UNKNOWN_EXCEPTION.getErrorCode())
@@ -116,14 +116,14 @@ public class ProductServiceImpl implements IProductService, ITransactionalServic
         try {
             return changeProductAvailableResponse(rq);
         } catch (ProductMplaceException e) {
-            log.error(e.getMessage());
+            log.error(e.getMessage(), e);
             return ChangeProductAvailableResponse.builder()
                     .success(false)
                     .errorCode(e.getE().getErrorCode())
                     .errorText(e.getE().getErrorText())
                     .build();
         } catch (Exception e) {
-            log.error(e.getMessage());
+            log.error(e.getMessage(), e);
             return ChangeProductAvailableResponse.builder()
                     .success(false)
                     .errorCode(ExceptionCode.UNKNOWN_EXCEPTION.getErrorCode())
@@ -137,14 +137,14 @@ public class ProductServiceImpl implements IProductService, ITransactionalServic
         try {
             return addReviewResponse(rq, userId, role);
         } catch (ProductMplaceException e) {
-            log.error(e.getMessage());
+            log.error(e.getMessage(), e);
             return AddReviewResponse.builder()
                     .success(false)
                     .errorCode(e.getE().getErrorCode())
                     .errorText(e.getE().getErrorText())
                     .build();
         } catch (Exception e) {
-            log.error(e.getMessage());
+            log.error(e.getMessage(), e);
             return AddReviewResponse.builder()
                     .success(false)
                     .errorCode(ExceptionCode.UNKNOWN_EXCEPTION.getErrorCode())
@@ -158,14 +158,14 @@ public class ProductServiceImpl implements IProductService, ITransactionalServic
         try {
             return addRatingResponse(rq, userId, role);
         } catch (ProductMplaceException e) {
-            log.error(e.getMessage());
+            log.error(e.getMessage(), e);
             return AddRatingResponse.builder()
                     .success(false)
                     .errorCode(e.getE().getErrorCode())
                     .errorText(e.getE().getErrorText())
                     .build();
         } catch (Exception e) {
-            log.error(e.getMessage());
+            log.error(e.getMessage(), e);
             return AddRatingResponse.builder()
                     .success(false)
                     .errorCode(ExceptionCode.UNKNOWN_EXCEPTION.getErrorCode())
@@ -179,20 +179,53 @@ public class ProductServiceImpl implements IProductService, ITransactionalServic
         try {
             return getProductInfoResponse(rq);
         } catch (ProductMplaceException e) {
-            log.error(e.getMessage());
+            log.error(e.getMessage(), e);
             return GetProductsInfoResponse.builder()
                     .success(false)
                     .errorCode(e.getE().getErrorCode())
                     .errorText(e.getE().getErrorText())
                     .build();
         } catch (Exception e) {
-            log.error(e.getMessage());
+            log.error(e.getMessage(), e);
             return GetProductsInfoResponse.builder()
                     .success(false)
                     .errorCode(ExceptionCode.UNKNOWN_EXCEPTION.getErrorCode())
                     .errorText(ExceptionCode.UNKNOWN_EXCEPTION.getErrorText())
                     .build();
         }
+    }
+
+    @Override
+    public DeleteProductResponse deleteProduct(DeleteProductRequest rq) {
+        try {
+            return deleteProductResponse(rq);
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+            return DeleteProductResponse.builder()
+                    .success(false)
+                    .errorCode(ExceptionCode.UNKNOWN_EXCEPTION.getErrorCode())
+                    .errorText(ExceptionCode.UNKNOWN_EXCEPTION.getErrorText())
+                    .build();
+        }
+    }
+
+    @Override
+    public ProductIsAppreciatedResponse productIsAppreciated(ProductIsAppreciatedRequest rq, Long userId) {
+        try {
+            return productIsAppreciatedResponse(rq, userId);
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+            return ProductIsAppreciatedResponse.builder()
+                    .success(false)
+                    .errorCode(ExceptionCode.UNKNOWN_EXCEPTION.getErrorCode())
+                    .errorText(ExceptionCode.UNKNOWN_EXCEPTION.getErrorText())
+                    .build();
+        }
+    }
+
+    private ProductIsAppreciatedResponse productIsAppreciatedResponse(ProductIsAppreciatedRequest rq, Long userId) {
+        Integer countAppreciated = ratingRepository.findByUserIdAndProductId(userId, rq.getProductId());
+        return ProductIsAppreciatedResponse.builder().success(true).appreciated(countAppreciated > 0).build();
     }
 
     private GetAllProductsResponse getAllProductsResponse() throws ProductMplaceException {
@@ -228,17 +261,16 @@ public class ProductServiceImpl implements IProductService, ITransactionalServic
         return response;
     }
 
-    private GetProductCardResponse getProductCardResponse(GetProductCardRequest rq, Long userId) throws ProductMplaceException {
+    private GetProductCardResponse getProductCardResponse(GetProductCardRequest rq) throws ProductMplaceException {
         ProductEntity product = productRepository.findById(rq.getProductId()).orElseThrow(() -> new ProductMplaceException(ExceptionCode.NOT_FOUND, "Продукт не найден " + rq.getProductId()));
         List<ProductReviewEntity> review = reviewRepository.findAllByProductId(product.getId());
         Double rating = ratingRepository.getAvgRatingByProduct(rq.getProductId());
-        Integer countAppreciated = ratingRepository.findByUserIdAndProductId(userId, rq.getProductId());
-        return buildProductCardResponse(product, rating, countAppreciated, review);
+        return buildProductCardResponse(product, rating, review);
     }
 
-    private GetProductCardResponse buildProductCardResponse(ProductEntity productEntity, Double avgRating, Integer countAppreciated, List<ProductReviewEntity> reviewEntities) {
+    private GetProductCardResponse buildProductCardResponse(ProductEntity productEntity, Double avgRating, List<ProductReviewEntity> reviewEntities) {
         List<Review> reviews = new ArrayList<>();
-        if (reviewEntities != null) {
+        if (!reviewEntities.isEmpty()) {
             for (ProductReviewEntity review : reviewEntities) {
                 reviews.add(Review.builder()
                         .userId(review.getUserId())
@@ -248,7 +280,6 @@ public class ProductServiceImpl implements IProductService, ITransactionalServic
             }
         }
         avgRating = avgRating != null ? avgRating : 0;
-        boolean appreciated = countAppreciated != null && countAppreciated > 0;
 
         return GetProductCardResponse.builder()
                 .success(true)
@@ -261,7 +292,7 @@ public class ProductServiceImpl implements IProductService, ITransactionalServic
                 .unitMeasure(productEntity.getUnitMeasure())
                 .type(productEntity.getType())
                 .rating(avgRating)
-                .appreciated(appreciated)
+                .appreciated(false)
                 .actual(productEntity.getActual())
                 .review(reviews)
                 .build();
@@ -332,7 +363,12 @@ public class ProductServiceImpl implements IProductService, ITransactionalServic
     }
 
     public GetProductsInfoResponse getProductInfoResponse(GetProductsInfoRequest rq) throws ProductMplaceException {
-        List<ProductEntity> products = productRepository.findByIds(rq.getProductIds());
+        List<ProductEntity> products = new ArrayList<>();
+        if (rq.getProductId().isEmpty()) {
+            products = productRepository.findAll();
+        } else {
+            products = productRepository.findByIds(rq.getProductId());
+        }
         if (products.isEmpty()) {
             throw new ProductMplaceException(ExceptionCode.NOT_FOUND_BY_IDS, "Продукты с указанным ID не найдены");
         }
@@ -353,7 +389,12 @@ public class ProductServiceImpl implements IProductService, ITransactionalServic
         });
         return GetProductsInfoResponse.builder()
                 .success(true)
-                .products(productsInfo)
+                .productsInfo(productsInfo)
                 .build();
+    }
+
+    private DeleteProductResponse deleteProductResponse(DeleteProductRequest rq) {
+        productRepository.deleteById(rq.getId());
+        return DeleteProductResponse.builder().success(true).build();
     }
 }

@@ -22,7 +22,7 @@ public class ProfileController {
      * @param userId идентификатор пользователя
      * @return профиль пользователя
      */
-    @PreAuthorize("#role == 'USER' || #role == 'MANAGER'")
+    @PreAuthorize("#role == 'USER' || #role == 'MANAGER' || #role == 'ADMIN'")
     @GetMapping(value = "/get")
     public GetProfileResponse getUserProfile(@RequestHeader("role") String role, @RequestHeader("userId") Long userId) {
         return profileService.getUserProfile(userId);
@@ -35,7 +35,7 @@ public class ProfileController {
      * @param userId идентификатор пользователя
      * @return true или false
      */
-    @PreAuthorize("#role == 'USER'")
+    @PreAuthorize("#role == 'USER' || #role == 'ADMIN' || #role == 'MANAGER'")
     @PostMapping(value = "/save")
     public SaveProfileResponse saveUserProfile(@RequestBody @Valid SaveProfileRequest rq, @RequestHeader("role") String role, @RequestHeader("userId") Long userId) {
         return profileService.saveUserProfile(rq, userId);

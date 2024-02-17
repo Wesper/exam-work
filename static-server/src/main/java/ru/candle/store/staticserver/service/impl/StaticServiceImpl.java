@@ -15,6 +15,7 @@ import ru.candle.store.staticserver.dto.response.GetImagesListResponse;
 import ru.candle.store.staticserver.dto.response.UploadImageResponse;
 import ru.candle.store.staticserver.service.IStaticService;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
@@ -100,8 +101,9 @@ public class StaticServiceImpl implements IStaticService {
     private UploadImageResponse uploadImageResponse(Image request) throws IOException, ServerException, InsufficientDataException, ErrorResponseException, NoSuchAlgorithmException, InvalidKeyException, InvalidResponseException, XmlParserException, InternalException {
         minioClient.putObject(PutObjectArgs.builder()
                 .bucket(bucketName)
-                .object(request.getFile().getOriginalFilename())
-                .stream(request.getFile().getInputStream(), request.getFile().getSize(), -1)
+                .object(request.getFilename())
+                .contentType(request.getContentType())
+                .stream(new ByteArrayInputStream(request.getFile()), request.getSize(), -1)
                 .build());
         return UploadImageResponse.builder().success(true).build();
     }

@@ -1,8 +1,11 @@
 package ru.candle.store.orderservice.service.impl;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.candle.store.orderservice.dictionary.ExceptionCode;
 import ru.candle.store.orderservice.dictionary.Status;
 import ru.candle.store.orderservice.dto.Order;
@@ -15,6 +18,7 @@ import ru.candle.store.orderservice.entity.OrderEntity;
 import ru.candle.store.orderservice.entity.ProductEntity;
 import ru.candle.store.orderservice.entity.PromocodeEntity;
 import ru.candle.store.orderservice.exception.OrderException;
+import ru.candle.store.orderservice.repository.BasketRepository;
 import ru.candle.store.orderservice.repository.OrderRepository;
 import ru.candle.store.orderservice.repository.PromocodeRepository;
 import ru.candle.store.orderservice.service.IIntegrationService;
@@ -22,17 +26,20 @@ import ru.candle.store.orderservice.service.IOrderService;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
 @Slf4j
 @Service
+@Transactional
 public class OrderServiceImpl implements IOrderService {
 
     @Autowired
     private OrderRepository orderRepository;
+
+    @Autowired
+    private BasketRepository basketRepository;
 
     @Autowired
     private PromocodeRepository promocodeRepository;
@@ -40,19 +47,22 @@ public class OrderServiceImpl implements IOrderService {
     @Autowired
     private IIntegrationService integrationService;
 
+    @Autowired
+    private ObjectMapper objectMapper;
+
     @Override
     public AddOrderResponse addOrder(AddOrderRequest rq, Long userId, String role) {
         try {
             return addOrderResponse(rq, userId, role);
         } catch (OrderException e) {
-            log.error(e.getMessage());
+            log.error(e.getMessage(), e);
             return AddOrderResponse.builder()
                     .success(false)
                     .errorCode(e.getE().getErrorCode())
                     .errorText(e.getE().getErrorText())
                     .build();
         } catch (Exception e) {
-            log.error(e.getMessage());
+            log.error(e.getMessage(), e);
             return AddOrderResponse.builder()
                     .success(false)
                     .errorCode(ExceptionCode.UNKNOWN_EXCEPTION.getErrorCode())
@@ -62,18 +72,18 @@ public class OrderServiceImpl implements IOrderService {
     }
 
     @Override
-    public GetOrderResponse getOrder(GetOrderRequest rq, Long userId, String role) {
+    public GetOrderResponse getOrder(GetOrderRequest rq, Long userId, String role, Boolean filterByUser) {
         try {
-            return getOrderResponse(rq, userId, role);
+            return getOrderResponse(rq, userId, role, filterByUser);
         } catch (OrderException e) {
-            log.error(e.getMessage());
+            log.error(e.getMessage(), e);
             return GetOrderResponse.builder()
                     .success(false)
                     .errorCode(e.getE().getErrorCode())
                     .errorText(e.getE().getErrorText())
                     .build();
         } catch (Exception e) {
-            log.error(e.getMessage());
+            log.error(e.getMessage(), e);
             return GetOrderResponse.builder()
                     .success(false)
                     .errorCode(ExceptionCode.UNKNOWN_EXCEPTION.getErrorCode())
@@ -87,14 +97,14 @@ public class OrderServiceImpl implements IOrderService {
         try {
             return changeOrderStatusResponse(rq);
         } catch (OrderException e) {
-            log.error(e.getMessage());
+            log.error(e.getMessage(), e);
             return ChangeOrderStatusResponse.builder()
                     .success(false)
                     .errorCode(e.getE().getErrorCode())
                     .errorText(e.getE().getErrorText())
                     .build();
         } catch (Exception e) {
-            log.error(e.getMessage());
+            log.error(e.getMessage(), e);
             return ChangeOrderStatusResponse.builder()
                     .success(false)
                     .errorCode(ExceptionCode.UNKNOWN_EXCEPTION.getErrorCode())
@@ -108,14 +118,14 @@ public class OrderServiceImpl implements IOrderService {
         try {
             return getAllOrdersByStatusResponse(rq);
         } catch (OrderException e) {
-            log.error(e.getMessage());
+            log.error(e.getMessage(), e);
             return GetAllOrdersByStatusResponse.builder()
                     .success(false)
                     .errorCode(e.getE().getErrorCode())
                     .errorText(e.getE().getErrorText())
                     .build();
         } catch (Exception e) {
-            log.error(e.getMessage());
+            log.error(e.getMessage(), e);
             return GetAllOrdersByStatusResponse.builder()
                     .success(false)
                     .errorCode(ExceptionCode.UNKNOWN_EXCEPTION.getErrorCode())
@@ -129,14 +139,14 @@ public class OrderServiceImpl implements IOrderService {
         try {
             return getOrderListResponse(userId);
         } catch (OrderException e) {
-            log.error(e.getMessage());
+            log.error(e.getMessage(), e);
             return GetOrderListResponse.builder()
                     .success(false)
                     .errorCode(e.getE().getErrorCode())
                     .errorText(e.getE().getErrorText())
                     .build();
         } catch (Exception e) {
-            log.error(e.getMessage());
+            log.error(e.getMessage(), e);
             return GetOrderListResponse.builder()
                     .success(false)
                     .errorCode(ExceptionCode.UNKNOWN_EXCEPTION.getErrorCode())
@@ -146,16 +156,16 @@ public class OrderServiceImpl implements IOrderService {
     }
 
     @Override
-    public IsUserPurchasedProductResponse isUserPurchasedProduct(IsUserPurchasedProductRequest rq) {
+    public IsUserPurchasedProductResponse isUserPurchasedProduct(IsUserPurchasedProductRequest rq, String userId) {
         try {
-            return isUserPurchasedProductResponse(rq);
+            return isUserPurchasedProductResponse(rq, userId);
         } catch (OrderException e) {
             return IsUserPurchasedProductResponse.builder()
                     .success(true)
                     .isPurchased(false)
                     .build();
         } catch (Exception e) {
-            log.error(e.getMessage());
+            log.error(e.getMessage(), e);
             return IsUserPurchasedProductResponse.builder()
                     .success(false)
                     .errorCode(ExceptionCode.UNKNOWN_EXCEPTION.getErrorCode())
@@ -164,9 +174,7 @@ public class OrderServiceImpl implements IOrderService {
         }
     }
 
-    private DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-
-    private AddOrderResponse addOrderResponse(AddOrderRequest rq, Long userId, String role) throws OrderException {
+    private AddOrderResponse addOrderResponse(AddOrderRequest rq, Long userId, String role) throws OrderException, JsonProcessingException {
         Long promocodePercent = null;
         if (rq.getPromocode() != null) {
             PromocodeEntity promocodeEntity = promocodeRepository.findByPromocode(rq.getPromocode());
@@ -213,28 +221,35 @@ public class OrderServiceImpl implements IOrderService {
             }
             productEntities.add(productEntity);
         }
-        ;
         totalPromoPrice = totalPrice > 0L && totalPromoPrice == 0L ? null : totalPromoPrice;
 
         OrderEntity orderEntity = new OrderEntity(
                 null,
                 userId,
-                LocalDateTime.now(ZoneId.of("UTC+5")).format(dateTimeFormatter),
+                LocalDateTime.now(ZoneId.of("UTC+5")).toString(),
                 rq.getAddress(),
                 rq.getPromocode(),
                 totalPrice,
                 totalPromoPrice,
-                productEntities,
+                objectMapper.writeValueAsString(productEntities),
                 Status.NEW
         );
         orderRepository.save(orderEntity);
-        orderRepository.deleteAllByUserId(userId);
+        basketRepository.deleteAllByUserId(userId);
         return AddOrderResponse.builder().success(true).build();
     }
 
-    private GetOrderResponse getOrderResponse(GetOrderRequest rq, Long userId, String role) throws OrderException {
-        GetUserInfoResponse userInfo = integrationService.getUserInfo(userId, role);
-        OrderEntity orderEntity = orderRepository.findByIdAndUserId(rq.getOrderId(), userId);
+    private GetOrderResponse getOrderResponse(GetOrderRequest rq, Long userId, String role, Boolean filterByUser) throws OrderException, JsonProcessingException {
+        OrderEntity orderEntity;
+        GetUserInfoResponse userInfo;
+        if (filterByUser) {
+            userInfo = integrationService.getUserInfo(userId, role);
+            orderEntity = orderRepository.findByIdAndUserId(rq.getOrderId(), userId);
+        } else {
+            orderEntity = orderRepository.findById(rq.getOrderId())
+                    .orElseThrow(() -> new OrderException(ExceptionCode.ORDER_NOT_FOUND, "Заказ не найден"));
+            userInfo = integrationService.getUserInfo(orderEntity.getUserId(), role);
+        }
         if (orderEntity == null) {
             throw new OrderException(ExceptionCode.ORDER_NOT_FOUND, "Заказ не найден");
         }
@@ -247,7 +262,7 @@ public class OrderServiceImpl implements IOrderService {
                 .promocode(orderEntity.getPromocode())
                 .totalPrice(orderEntity.getTotalPrice())
                 .totalPromoPrice(orderEntity.getTotalPromoPrice())
-                .products(orderEntity.getDetails())
+                .products(List.of(objectMapper.readValue(orderEntity.getDetails(), ProductEntity[].class)))
                 .status(orderEntity.getStatus())
                 .build();
     }
@@ -305,13 +320,13 @@ public class OrderServiceImpl implements IOrderService {
     }
 
 
-    private IsUserPurchasedProductResponse isUserPurchasedProductResponse(IsUserPurchasedProductRequest rq) throws OrderException {
-        List<OrderEntity> orderEntities = orderRepository.findAllByUserId(rq.getUserId());
+    private IsUserPurchasedProductResponse isUserPurchasedProductResponse(IsUserPurchasedProductRequest rq, String userId) throws OrderException, JsonProcessingException {
+        List<OrderEntity> orderEntities = orderRepository.findAllByUserId(Long.valueOf(userId));
         if (orderEntities.isEmpty()) {
             throw new OrderException(ExceptionCode.USER_DONT_HAVE_ORDERS, "У пользователя нет заказов");
         }
         for (OrderEntity order : orderEntities) {
-            for (ProductEntity product: order.getDetails()) {
+            for (ProductEntity product: List.of(objectMapper.readValue(order.getDetails(), ProductEntity[].class))) {
                 if (product.getProductId().equals(rq.getProductId())) {
                     return IsUserPurchasedProductResponse.builder()
                             .success(true)

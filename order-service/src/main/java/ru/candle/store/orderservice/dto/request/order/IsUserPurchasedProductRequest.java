@@ -14,8 +14,5 @@ import lombok.NoArgsConstructor;
 public class IsUserPurchasedProductRequest {
 
     @NotNull
-    private Long userId;
-
-    @NotNull
     private Long productId;
 }

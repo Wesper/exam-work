@@ -1,0 +1,69 @@
+<html lang="ru" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Заказы</title>
+    <link rel="stylesheet" th:href="@{/css/bootstrap.min.css}">
+    <link rel="stylesheet" th:href="@{/css/bootstrap-icons.css}">
+    <link rel="stylesheet" th:href="@{/css/all.min.css}">
+    <script th:src="@{/js/bootstrap.bundle.min.js}"></script>
+    <script th:src="@{/js/jquery-3.7.1.js}"></script>
+    <script th:src="@{/js/custom.js}"></script>
+</head>
+<body>
+
+<script>
+    $(document).ready(function () {
+        $("tr").click(function() {
+            window.location = $(this).attr("href");
+        });
+    });
+</script>
+
+<th:block th:include="fragments/header.html"></th:block>
+
+<div>
+    <br>
+</div>
+
+<div class="d-flex align-items-center justify-content-center vh-100" th:if="${orderIsEmpty != null}">
+    <div class="text-center">
+        <p class="fs-3"><span class="text-danger">Хммм..</span> Кажется, вы еще не оформили заказ.</p>
+    </div>
+</div>
+
+
+<table class="table align-middle bg-white table-hover" th:if="${orders != null}">
+    <thead class="bg-light">
+    <tr>
+        <th>Номер заказа</th>
+        <th>Дата заказа</th>
+        <th>Цена</th>
+        <th>Цена со скидкой</th>
+        <th>Статус</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="order : ${orders}" class='clickable-row' th:href="@{/order/get/{orderId}(orderId=${order.orderId})}">
+        <td>
+            <p class="fw-normal mb-1" th:text="${order.orderId}"></p>
+        </td>
+        <td>
+            <p th:text="${#strings.substring(order.date,0,10) + ' ' + #strings.substring(order.date,11,19)}"></p>
+        </td>
+        <td>
+            <p class="fw-normal mb-1" th:text="${order.totalPrice}"></p>
+        </td>
+        <td>
+            <p class="fw-normal mb-1" th:text="${order.totalPromoPrice}"></p>
+        </td>
+        <td th:switch="${order.status.name}">
+            <p class="fw-normal mb-1" th:case="NEW">Новый</p>
+            <p class="fw-normal mb-1" th:case="IN_PROGRESS">В обработке</p>
+            <p class="fw-normal mb-1" th:case="FINISHED">Завершен</p>
+            <p class="fw-normal mb-1" th:case="CANCELLED">Отменен</p>
+        </td>
+    </tr>
+    </tbody>
+</table>
+
+</body>
+</html>

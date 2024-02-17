@@ -22,7 +22,7 @@ public class OrderController {
      * @param userId идентификатор пользователя
      * @return true или false
      */
-    @PreAuthorize("#role == 'USER'")
+    @PreAuthorize("#role == 'USER' || #role == 'ADMIN' || #role == 'MANAGER'")
     @PostMapping(value = "/add")
     public AddOrderResponse addOrder(@RequestBody @Valid AddOrderRequest rq, @RequestHeader("role") String role, @RequestHeader("userId") Long userId) {
         return service.addOrder(rq, userId, role);
@@ -35,19 +35,20 @@ public class OrderController {
      * @param userId идентификатор пользователя
      * @return информация о заказе
      */
-    @PreAuthorize("#role == 'USER'")
+    @PreAuthorize("#role == 'USER' || #role == 'ADMIN' || #role == 'MANAGER'")
     @PostMapping(value = "/get")
     public GetOrderResponse getOrder(@RequestBody @Valid GetOrderRequest rq, @RequestHeader("role") String role, @RequestHeader("userId") Long userId) {
-        return service.getOrder(rq, userId, role);
+        Boolean filterByUser = role.equals("USER");
+        return service.getOrder(rq, userId, role, filterByUser);
     }
 
     /**
-     * Получегте списка заказов
+     * Получеиее списка заказов
      * @param role поль пользователя
      * @param userId идентификатор пользователя
      * @return список заказов
      */
-    @PreAuthorize("#role == 'USER'")
+    @PreAuthorize("#role == 'USER' || #role == 'ADMIN' || #role == 'MANAGER'")
     @GetMapping(value = "/get")
     public GetOrderListResponse getOrderList(@RequestHeader("role") String role, @RequestHeader("userId") Long userId) {
         return service.getOrderList(userId);
@@ -59,7 +60,7 @@ public class OrderController {
      * @param role поль пользователя
      * @return true или false
      */
-    @PreAuthorize("#role == 'MANAGER'")
+    @PreAuthorize("#role == 'MANAGER' || #role == 'ADMIN'")
     @PostMapping(value = "/status/change")
     public ChangeOrderStatusResponse changeOrderStatus(@RequestBody @Valid ChangeOrderStatusRequest rq, @RequestHeader("role") String role) {
         return service.changeOrderStatus(rq);
@@ -71,22 +72,22 @@ public class OrderController {
      * @param role поль пользователя
      * @return список заказов
      */
-    @PreAuthorize("#role == 'MANAGER'")
+    @PreAuthorize("#role == 'MANAGER' || #role == 'ADMIN'")
     @PostMapping(value = "/all/get")
     public GetAllOrdersByStatusResponse getAllOrders(@RequestBody @Valid GetAllOrdersByStatusRequest rq, @RequestHeader("role") String role) {
         return service.getAllOrdersByStatus(rq);
     }
 
     /**
-     * Получение всех заказов со статусом
+     * Признак наличия продукта у клиента в списке купленных
      * @param rq запрос
      * @param role поль пользователя
      * @return список заказов
      */
-    @PreAuthorize("#role == 'MANAGER'")
+    @PreAuthorize("#role == 'USER' || #role == 'MANAGER' || #role == 'ADMIN'")
     @PostMapping(value = "/purchased")
-    public IsUserPurchasedProductResponse getAllOrders(@RequestBody @Valid IsUserPurchasedProductRequest rq, @RequestHeader("role") String role) {
-        return service.isUserPurchasedProduct(rq);
+    public IsUserPurchasedProductResponse isUserPurchasedProduct(@RequestBody @Valid IsUserPurchasedProductRequest rq, @RequestHeader("role") String role, @RequestHeader("userId") String userId) {
+        return service.isUserPurchasedProduct(rq, userId);
     }
 
 }

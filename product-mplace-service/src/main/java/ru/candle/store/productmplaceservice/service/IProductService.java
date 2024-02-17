@@ -17,7 +17,7 @@ public interface IProductService {
      * @param userId идентификатор пользователя
      * @return карточка продукта
      */
-    GetProductCardResponse getProductCard(GetProductCardRequest rq, Long userId);
+    GetProductCardResponse getProductCard(GetProductCardRequest rq);
 
     /**
      * Добавление продукта
@@ -64,4 +64,13 @@ public interface IProductService {
      * @return список продуктов
      */
     GetProductsInfoResponse getProductInfoByIds(GetProductsInfoRequest rq);
+
+    /**
+     * Удаление продукта
+     * @param rq запрос
+     * @return true или false
+     */
+    DeleteProductResponse deleteProduct(DeleteProductRequest rq);
+
+    ProductIsAppreciatedResponse productIsAppreciated(ProductIsAppreciatedRequest rq, Long userId);
 }

@@ -14,7 +14,7 @@ public enum ExceptionCode {
     USER_BASKET_IS_EMPTY("USER_BASKET_IS_EMPTY","Корзина пуста"),
     GET_PRODUCTS_INFO_IS_NULL("GET_PRODUCTS_INFO_NULL","Информаци о продуктах не получена"),
     GET_USER_PROFILE_IS_NULL("GET_USER_PROFILE_IS_NULL","Профиль не получен"),
-    PRODUCT_NOT_FOUND("PRODUCT_NOT_FOUND","Не найден продукт для удаления"),
+    PRODUCT_NOT_FOUND("PRODUCT_NOT_FOUND","Продукты пользователя не найдены"),
     ORDER_NOT_FOUND("ORDER_NOT_FOUND","Заказ не найден"),
     USER_DONT_HAVE_ORDERS("USER_DONT_HAVE_ORDERS","Заказы не найдены"),
     ORDER_IN_SEARCH_STATUS_NOT_FOUND("ORDER_IN_SEARCH_STATUS_NOT_FOUND","Заказы в запрашиваемом статусе не найдены"),

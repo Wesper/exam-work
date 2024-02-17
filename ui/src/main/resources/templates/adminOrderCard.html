@@ -1,0 +1,120 @@
+<html lang="ru" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Управление заказами</title>
+    <link rel="stylesheet" th:href="@{/css/bootstrap.min.css}">
+    <link rel="stylesheet" th:href="@{/css/bootstrap-icons.css}">
+    <link rel="stylesheet" th:href="@{/css/all.min.css}">
+    <script th:src="@{/js/bootstrap.bundle.min.js}"></script>
+    <script th:src="@{/js/jquery-3.7.1.js}"></script>
+    <script th:src="@{/js/custom.js}"></script>
+</head>
+<body>
+
+<th:block th:include="fragments/header.html"></th:block>
+
+<div>
+    <br>
+</div>
+
+<div class="d-flex align-items-center justify-content-center vh-100" th:if="${orderIsEmpty != null}">
+    <div class="text-center">
+        <p class="fs-3"><span class="text-danger">Хммм..</span> Заказы в данном статусе отсутствуют.</p>
+    </div>
+</div>
+
+<div class="row gy-3 overflow-hidden">
+    <table class="table align-middle mb-0 bg-white" th:if="${order != null}">
+        <thead class="bg-light">
+        <tr>
+            <th></th>
+            <th>Заголовок</th>
+            <th>Цена</th>
+            <th>Цена со скидкой</th>
+            <th>Количество</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="product : ${order.products}">
+            <td>
+                <div class="d-flex align-items-center">
+                    <img
+                            th:src="${minioHost + product.imageId}"
+                            alt=""
+                            style="width: 65px; height: 65px"
+                            class="rounded-circle"
+                    />
+                </div>
+            </td>
+            <td>
+                <p class="fw-normal mb-1" th:text="${product.title}"></p>
+            </td>
+            <td>
+                <p class="fw-normal mb-1" th:text="${product.price}"></p>
+            </td>
+            <td>
+                <p class="fw-normal mb-1" th:text="${product.promoPrice}"></p>
+            </td>
+            <td>
+                <p class="fw-normal mb-1" th:text="${product.count}"></p>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+
+<hr>
+<div class="row w-100 p-2">
+    <div class="col-6">
+        <div>
+            <h3>Данные получателя</h3>
+        </div>
+        <div class="gy-3 overflow-hidden">
+            <div class="col-6">
+                <div class="form-floating mb-3">
+                    <input type="text" class="form-control" name="lastName" id="lastName" th:value="${order.lastName}"
+                           disabled>
+                    <label for="lastName">Фамилия</label>
+                </div>
+            </div>
+            <div class="col-6">
+                <div class="form-floating mb-3">
+                    <input type="text" class="form-control" name="firstName" id="firstName"
+                           th:value="${order.firstName}" disabled>
+                    <label for="firstName">Имя</label>
+                </div>
+            </div>
+            <div class="col-6">
+                <div class="form-floating mb-3">
+                    <input type="text" class="form-control" name="address" id="address" th:value="${order.address}"
+                           disabled>
+                    <label for="address">Адрес</label>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-6" th:if="${!order.status.name.equals('CANCELLED') && !order.status.name.equals('FINISHED')}">
+        <form id="statusChange" method="post" th:action="@{/admin/orders/status/change(orderId=${orderId})}">
+            <div class="row gy-3 overflow-hidden">
+                <div class="col-6">
+                    <div class="form-floating mb-3">
+                        <select class="form-select" id="status" name="status">
+                            <option value="IN_PROGRESS" th:if="${order.status.name.equals('NEW')}">В обработке
+                            </option>
+                            <option value="FINISHED" th:if="${order.status.name.equals('NEW')
+                            || order.status.name.equals('IN_PROGRESS')}">Завершен</option>
+                            <option value="CANCELLED" th:if="${order.status.name.equals('NEW')
+                            || order.status.name.equals('IN_PROGRESS')}">Отменен</option>
+                        </select>
+                        <label for="status">Статус</label>
+                    </div>
+                </div>
+                <div class="col-4">
+                    <button class="btn btn-outline-dark" type="submit">Изменить статус</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+</body>
+</html>

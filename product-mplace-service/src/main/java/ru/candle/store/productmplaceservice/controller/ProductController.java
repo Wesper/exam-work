@@ -28,12 +28,11 @@ public class ProductController {
     /**
      * Получение карточки продукта
      * @param rq запрос
-     * @param userId идентификатор пользователя
      * @return карточка продукта
      */
     @PostMapping(value = "/card")
-    public GetProductCardResponse getProductCard(@RequestBody @Valid GetProductCardRequest rq, @RequestHeader("userId") Long userId) {
-        return productService.getProductCard(rq, userId);
+    public GetProductCardResponse getProductCard(@RequestBody @Valid GetProductCardRequest rq) {
+        return productService.getProductCard(rq);
     }
 
     /**
@@ -42,10 +41,22 @@ public class ProductController {
      * @param role роль пользователя
      * @return список продуктов
      */
-    @PreAuthorize("#role == 'USER'")
+    @PreAuthorize("#role == 'USER' || #role == 'ADMIN' || #role == 'MANAGER'")
     @PostMapping(value = "/info/get")
     public GetProductsInfoResponse getProductInfoByIds(@RequestBody @Valid GetProductsInfoRequest rq, @RequestHeader("role") String role) {
         return productService.getProductInfoByIds(rq);
+    }
+
+    /**
+     * Получение признака оценки продукта
+     * @param rq запрос
+     * @param role роль пользователя
+     * @return список продуктов
+     */
+    @PreAuthorize("#role == 'USER' || #role == 'ADMIN' || #role == 'MANAGER'")
+    @PostMapping(value = "/appreciated")
+    public ProductIsAppreciatedResponse productIsAppreciated(@RequestBody @Valid ProductIsAppreciatedRequest rq, @RequestHeader("role") String role, @RequestHeader(value = "userId", required = false) Long userId) {
+        return productService.productIsAppreciated(rq, userId);
     }
 
     /**
@@ -73,6 +84,18 @@ public class ProductController {
     }
 
     /**
+     * Удаление продукта
+     * @param rq запрос
+     * @param role роль пользователя
+     * @return true или false
+     */
+    @PreAuthorize("#role == 'ADMIN'")
+    @PostMapping(value = "/delete")
+    public DeleteProductResponse deleteProduct(@RequestBody @Valid DeleteProductRequest rq, @RequestHeader("role") String role) {
+        return productService.deleteProduct(rq);
+    }
+
+    /**
      * Изменение статуса продукта
      * @param rq запрос
      * @param role роль пользователя
@@ -91,7 +114,7 @@ public class ProductController {
      * @param role роль пользователя
      * @return true или false
      */
-    @PreAuthorize("#role == 'USER'")
+    @PreAuthorize("#role == 'USER' || #role == 'ADMIN' || #role == 'MANAGER'")
     @PostMapping(value = "/review/add")
     public AddReviewResponse addReview(@RequestBody @Valid AddReviewRequest rq, @RequestHeader("userId") Long userId, @RequestHeader("role") String role) {
         return productService.addReview(rq, userId, role);
@@ -104,9 +127,9 @@ public class ProductController {
      * @param role роль пользователя
      * @return true или false
      */
-    @PreAuthorize("#role == 'USER'")
+    @PreAuthorize("#role == 'USER' || #role == 'ADMIN' || #role == 'MANAGER'")
     @PostMapping(value = "/rating/add")
-    public AddRatingResponse addProduct(@RequestBody @Valid AddRatingRequest rq, @RequestHeader("userId") Long userId, @RequestHeader("role") String role) {
+    public AddRatingResponse addRating(@RequestBody @Valid AddRatingRequest rq, @RequestHeader("userId") Long userId, @RequestHeader("role") String role) {
         return productService.addRating(rq, userId, role);
     }
 }

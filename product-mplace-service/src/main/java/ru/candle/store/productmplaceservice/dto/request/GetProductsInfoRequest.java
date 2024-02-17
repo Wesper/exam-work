@@ -15,5 +15,5 @@ import java.util.List;
 public class GetProductsInfoRequest {
 
     @NotNull
-    private List<Long> productIds;
+    private List<Long> productId;
 }

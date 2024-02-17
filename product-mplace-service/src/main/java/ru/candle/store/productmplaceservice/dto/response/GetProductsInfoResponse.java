@@ -15,7 +15,7 @@ import java.util.List;
 public class GetProductsInfoResponse {
 
     private Boolean success;
-    private List<ProductInfo> products;
+    private List<ProductInfo> productsInfo;
     private String errorCode;
     private String errorText;
 }

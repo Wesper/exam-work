@@ -28,7 +28,7 @@ public class UserServiceTest {
                 "One",
                 "OnePass",
                 "one@one.ru",
-                Role.ROLE_USER
+                Role.USER
         );
         Mockito.when(repository.save(Mockito.any())).thenReturn(expectedUser);
 
@@ -48,7 +48,7 @@ public class UserServiceTest {
                 "One",
                 "OnePass",
                 "one@one.ru",
-                Role.ROLE_USER
+                Role.USER
         );
         Mockito.when(repository.existsByUsername(Mockito.any())).thenReturn(true);
 
@@ -62,7 +62,7 @@ public class UserServiceTest {
                 "One",
                 "OnePass",
                 "one@one.ru",
-                Role.ROLE_USER
+                Role.USER
         );
         Mockito.when(repository.existsByEmail(Mockito.any())).thenReturn(true);
 

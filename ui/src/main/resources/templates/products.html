@@ -1,0 +1,171 @@
+<html lang="ru" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Управление продуктами</title>
+    <link rel="stylesheet" th:href="@{/css/bootstrap.min.css}">
+    <link rel="stylesheet" th:href="@{/css/bootstrap-icons.css}">
+    <link rel="stylesheet" th:href="@{/css/all.min.css}">
+    <script th:src="@{/js/bootstrap.bundle.min.js}"></script>
+    <script th:src="@{/js/jquery-3.7.1.js}"></script>
+    <script th:src="@{/js/custom.js}"></script>
+</head>
+<body>
+
+<th:block th:include="fragments/header.html"></th:block>
+
+<div>
+    <br>
+</div>
+
+<div class="d-flex align-items-center justify-content-center vh-100" th:if="${productIsEmpty != null}">
+    <div class="text-center">
+        <p class="fs-3"> <span class="text-danger">Хммм..</span> Кажется, вы еще не добавили продукты.</p>
+    </div>
+</div>
+
+<table class="table align-middle mb-0 bg-white" th:if="${products != null}" >
+    <thead class="bg-light">
+    <tr>
+        <th></th>
+        <th>Номер</th>
+        <th>Изображение</th>
+        <th>Заголовок</th>
+        <th>Подзаголовок</th>
+        <th>Описание</th>
+        <th>Цена</th>
+        <th>Тип</th>
+        <th>Измерение</th>
+        <th>Единица измерения</th>
+        <th>Актуальность</th>
+        <th>Действия</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="product : ${products}">
+        <td>
+            <div class="d-flex align-items-center">
+                <img
+                        th:src="${minioHost + product.imageId}"
+                        alt=""
+                        style="width: 65px; height: 65px"
+                        class="rounded-circle"
+                />
+            </div>
+        </td>
+        <td>
+            <p class="fw-normal mb-1" th:text="${product.productId}"></p>
+        </td>
+        <td>
+            <p class="fw-normal mb-1" th:text="${product.imageId}"></p>
+        </td>
+        <td>
+            <p class="fw-normal mb-1" th:text="${product.title}"></p>
+        </td>
+        <td>
+            <p class="fw-normal mb-1" th:text="${product.subtitle}"></p>
+        </td>
+        <td>
+            <p class="fw-normal mb-1" th:text="${product.description}"></p>
+        </td>
+        <td>
+            <p class="fw-normal mb-1" th:text="${product.price}"></p>
+        </td>
+        <td>
+            <p class="fw-normal mb-1" th:text="${product.type}"></p>
+        </td>
+        <td>
+            <p class="fw-normal mb-1" th:text="${product.measure}"></p>
+        </td>
+        <td>
+            <p class="fw-normal mb-1" th:text="${product.unitMeasure}"></p>
+        </td>
+        <td>
+            <p class="fw-normal mb-1" th:text="${product.actual}"></p>
+        </td>
+        <td>
+            <a th:href="@{/admin/products/delete/{productId}(productId=${product.productId})}">
+                <button type="button" class="btn btn btn-outline-dark">
+                    Удалить
+                </button>
+            </a>
+            <a th:href="@{/admin/products/change/available(productId=${product.productId}, actual=${!product.actual})}">
+                <button type="button" class="btn btn btn-outline-dark">
+                    Изменить видимость
+                </button>
+            </a>
+        </td>
+    </tr>
+    </tbody>
+</table>
+
+<hr>
+<div class="w-100 p-2">
+    <form id="signin" method="post" th:action="@{./add}">
+        <div class="row gy-3 overflow-hidden">
+            <div class="col-4">
+                <div class="form-floating mb-3">
+                    <input type="text" class="form-control" name="imageId" id="imageId" placeholder="imageId" required>
+                    <label for="imageId">Изображение</label>
+                </div>
+            </div>
+            <div class="col-4">
+                <div class="form-floating mb-3">
+                    <input type="text" class="form-control" name="title" id="title" placeholder="title" required>
+                    <label for="title">Заголовок</label>
+                </div>
+            </div>
+            <div class="col-4">
+                <div class="form-floating mb-3">
+                    <input type="text" class="form-control" name="subtitle" id="subtitle" placeholder="subtitle" required>
+                    <label for="subtitle">Подзаголовок</label>
+                </div>
+            </div>
+            <div class="col-4">
+                <div class="form-floating mb-3">
+                    <input type="text" class="form-control" name="description" id="description" placeholder="description" required>
+                    <label for="description">Описание</label>
+                </div>
+            </div>
+            <div class="col-4">
+                <div class="form-floating mb-3">
+                    <input type="number" class="form-control" name="price" id="price" placeholder="price" required>
+                    <label for="price">Цена</label>
+                </div>
+            </div>
+            <div class="col-4">
+                <div class="form-floating mb-3">
+                    <input type="text" class="form-control" name="type" id="type" placeholder="type" required>
+                    <label for="type">Тип</label>
+                </div>
+            </div>
+            <div class="col-4">
+                <div class="form-floating mb-3">
+                    <input type="number" class="form-control" name="measure" id="measure" placeholder="measure" required>
+                    <label for="measure">Измерение</label>
+                </div>
+            </div>
+            <div class="col-4">
+                <div class="form-floating mb-3">
+                    <input type="text" class="form-control" name="unitMeasure" id="unitMeasure" placeholder="unitMeasure" required>
+                    <label for="unitMeasure">Единица измерения</label>
+                </div>
+            </div>
+            <div class="col-4">
+                <div class="form-floating mb-3">
+                    <select class="form-select" id="actual" name="actual">
+                        <option selected>true</option>
+                        <option value="2">false</option>
+                    </select>
+                    <label for="actual">Актуальность</label>
+                </div>
+            </div>
+            <div class="col-3">
+                <div class="d-grid">
+                    <button class="btn btn-dark btn-lg" type="submit">Добавить продукт</button>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+
+</body>
+</html>

@@ -30,6 +30,7 @@ public class IntegrationServiceTest {
         IsUserPurchasedProductRequest request = new IsUserPurchasedProductRequest(1L, 1L);
         HttpHeaders headers = new HttpHeaders();
         headers.set("role", role);
+        headers.set("userId", request.getUserId().toString());
         HttpEntity<IsUserPurchasedProductRequest> entity = new HttpEntity<>(request, headers);
         IsUserPurchasedProductResponse response = IsUserPurchasedProductResponse.builder().success(true).isPurchased(true).build();
         Mockito.when(restTemplate.postForObject("http://order-service/order/purchased", entity, IsUserPurchasedProductResponse.class)).thenReturn(response);
@@ -44,6 +45,7 @@ public class IntegrationServiceTest {
         IsUserPurchasedProductRequest request = new IsUserPurchasedProductRequest(1L, 1L);
         HttpHeaders headers = new HttpHeaders();
         headers.set("role", role);
+        headers.set("userId", request.getUserId().toString());
         HttpEntity<IsUserPurchasedProductRequest> entity = new HttpEntity<>(request, headers);
         IsUserPurchasedProductResponse response = IsUserPurchasedProductResponse.builder()
                 .success(true)
@@ -61,6 +63,7 @@ public class IntegrationServiceTest {
         IsUserPurchasedProductRequest request = new IsUserPurchasedProductRequest(1L, 1L);
         HttpHeaders headers = new HttpHeaders();
         headers.set("role", role);
+        headers.set("userId", request.getUserId().toString());
         HttpEntity<IsUserPurchasedProductRequest> entity = new HttpEntity<>(request, headers);
         IsUserPurchasedProductResponse response = IsUserPurchasedProductResponse.builder()
                 .success(false)
@@ -79,6 +82,7 @@ public class IntegrationServiceTest {
         IsUserPurchasedProductRequest request = new IsUserPurchasedProductRequest(1L, 1L);
         HttpHeaders headers = new HttpHeaders();
         headers.set("role", role);
+        headers.set("userId", request.getUserId().toString());
         HttpEntity<IsUserPurchasedProductRequest> entity = new HttpEntity<>(request, headers);
         Mockito.when(restTemplate.postForObject("http://order-service/order/purchased", entity, IsUserPurchasedProductResponse.class)).thenReturn(null);
 

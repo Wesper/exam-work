@@ -21,14 +21,14 @@ public class SaveProfileRequest {
     @Size(max = 32, message = "Поле должно иметь размер до 32")
     private String middleName;
 
-    @Size(max = 32, message = "Поле должно иметь размер до 32")
+    @Size(max = 64, message = "Поле должно иметь размер до 64")
     private String city;
 
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     @NonNull
     private String birthday;
 
-    @Size(max = 32, message = "Поле должно иметь размер до 32")
+    @Size(max = 256, message = "Поле должно иметь размер до 256")
     private String address;
 
 }

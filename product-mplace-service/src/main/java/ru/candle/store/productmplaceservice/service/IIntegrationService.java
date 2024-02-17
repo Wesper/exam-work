@@ -10,7 +10,6 @@ public interface IIntegrationService {
      * @param userId идентификатор пользователя
      * @param role роль пользователя
      * @return признак приобретения продукта
-     * @throws ProductMplaceException
      */
     boolean isUserPurchasedProduct(Long productId, Long userId, String role) throws ProductMplaceException;
 }

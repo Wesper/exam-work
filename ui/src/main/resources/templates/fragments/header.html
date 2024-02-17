@@ -1,0 +1,43 @@
+<nav class="navbar navbar-expand-lg navbar-light bg-light" style="height: 80px !important; font-size: 18px">
+    <div class="container-fluid">
+        <a class="navbar-brand mb-0 h3" th:href="@{/home}" style="font-size: 28px">Candle Store</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+                aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span></button>
+
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ms-auto">
+                <li class="nav-item">
+                    <a class="nav-link active" aria-current="page" th:href="@{/home}"><i class="bi bi-house-fill"></i> Главная</a>
+                </li>
+                <li class="nav-item" th:if="${role.equals('USER')}">
+                    <a class="nav-link" th:href="@{/basket}"><i class="bi bi-cart-fill"></i> Корзина</a>
+                </li>
+                <li class="nav-item dropdown" th:if="${role.equals('ADMIN') || role.equals('MANAGER')}">
+                    <a class="nav-link dropdown-toggle" id="navbarDropdown" role="button"
+                       data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="bi bi-megaphone-fill"></i> Администрирование
+                    </a>
+                    <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+                        <li th:if="${role.equals('MANAGER')}"><a class="dropdown-item" th:href="@{/admin/orders/list(status='NEW')}">Обработка заказов</a></li>
+                        <li th:if="${role.equals('ADMIN')}"><a class="dropdown-item" th:href="@{/admin/images/list}">Управление статикой</a></li>
+                        <li th:if="${role.equals('ADMIN')}"><a class="dropdown-item" th:href="@{/admin/products/list}">Управление продуктами</a></li>
+                        <li th:if="${role.equals('ADMIN')}"><a class="dropdown-item" th:href="@{/admin/promocodes/list}">Управление промокодами</a></li>
+                    </ul>
+                </li>
+                <li class="nav-item" th:if="${role.equals('USER')}">
+                    <a class="nav-link" th:href="@{/profile}"><i class="bi bi-person-fill"></i>Профиль</a>
+                </li>
+                <li class="nav-item" th:if="${role.equals('USER')}">
+                    <a class="nav-link" th:href="@{/order/list}"><i class="bi bi-card-list"></i> Заказы</a>
+                </li>
+                <li class="nav-item" th:if="${role.equals('')}">
+                    <a class="nav-link" th:href="@{/auth/signIn}"><i class="bi bi-door-closed-fill"></i> Вход</a>
+                </li>
+                <li class="nav-item" th:if="${!role.equals('')}">
+                    <a class="nav-link" th:href="@{/auth/logOut}"><i class="bi bi-door-open-fill"></i> Выход</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>

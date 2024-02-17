@@ -92,7 +92,7 @@ public class ProductServiceTest {
         GetProductCardRequest request = new GetProductCardRequest(2L);
         Mockito.when(productRepository.findById(Mockito.any())).thenReturn(Optional.ofNullable(null));
 
-        GetProductCardResponse response = productService.getProductCard(request, userId);
+        GetProductCardResponse response = productService.getProductCard(request);
         Assertions.assertAll(
                 () -> Assertions.assertFalse(response.getSuccess()),
                 () -> Assertions.assertEquals(ExceptionCode.NOT_FOUND.getErrorCode(), response.getErrorCode()),
@@ -117,19 +117,17 @@ public class ProductServiceTest {
         List<Review> expReviews = new ArrayList<>();
         expReviews.add(new Review(1L, "Review text"));
         expReviews.add(new Review(2L, "Review text 2"));
-        GetProductCardResponse expProducts = new GetProductCardResponse(true, 2L, "a.jpeg", "Product 2", "If you buy the product you win", 1L, "1", "kg", "A", 2.5, true, true, expReviews, null, null);
+        GetProductCardResponse expProducts = new GetProductCardResponse(true, 2L, "a.jpeg", "Product 2", "If you buy the product you win", 1L, "1", "kg", "A", 2.5, true, false, expReviews, null, null);
         Mockito.when(productRepository.findById(Mockito.any())).thenReturn(Optional.of(product));
         Mockito.when(reviewRepository.findAllByProductId(Mockito.any())).thenReturn(reviews);
         Mockito.when(ratingRepository.getAvgRatingByProduct(Mockito.any())).thenReturn(2.5);
-        Mockito.when(ratingRepository.findByUserIdAndProductId(Mockito.any(), Mockito.any())).thenReturn(1);
 
-        GetProductCardResponse response = productService.getProductCard(request, userId);
+        GetProductCardResponse response = productService.getProductCard(request);
         Assertions.assertEquals(expProducts, response);
 
         Mockito.verify(productRepository, Mockito.times(1)).findById(Mockito.any());
         Mockito.verify(reviewRepository, Mockito.times(1)).findAllByProductId(Mockito.any());
         Mockito.verify(ratingRepository, Mockito.times(1)).getAvgRatingByProduct(Mockito.any());
-        Mockito.verify(ratingRepository, Mockito.times(1)).findByUserIdAndProductId(Mockito.any(), Mockito.any());
     }
 
     @Test
@@ -141,17 +139,15 @@ public class ProductServiceTest {
         List<Review> expReviews = new ArrayList<>();
         GetProductCardResponse expProducts = new GetProductCardResponse(true, 2L, "a.jpeg", "Product 2", "If you buy the product you win", 1L, "1", "kg", "A", 0.0, true, false, expReviews, null, null);
         Mockito.when(productRepository.findById(Mockito.any())).thenReturn(Optional.of(product));
-        Mockito.when(reviewRepository.findAllByProductId(Mockito.any())).thenReturn(null);
+        Mockito.when(reviewRepository.findAllByProductId(Mockito.any())).thenReturn(new ArrayList<>());
         Mockito.when(ratingRepository.getAvgRatingByProduct(Mockito.any())).thenReturn(null);
-        Mockito.when(ratingRepository.findByUserIdAndProductId(Mockito.any(), Mockito.any())).thenReturn(0);
 
-        GetProductCardResponse response = productService.getProductCard(request, userId);
+        GetProductCardResponse response = productService.getProductCard(request);
         Assertions.assertEquals(expProducts, response);
 
         Mockito.verify(productRepository, Mockito.times(1)).findById(Mockito.any());
         Mockito.verify(reviewRepository, Mockito.times(1)).findAllByProductId(Mockito.any());
         Mockito.verify(ratingRepository, Mockito.times(1)).getAvgRatingByProduct(Mockito.any());
-        Mockito.verify(ratingRepository, Mockito.times(1)).findByUserIdAndProductId(Mockito.any(), Mockito.any());
     }
 
     @Test
