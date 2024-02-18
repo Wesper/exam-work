@@ -183,6 +183,64 @@ public class AdminServiceImpl implements IAdminService {
         }
     }
 
+    @Override
+    public String getUsersForm(Model model, HttpServletRequest servletRequest, HttpServletResponse servletResponse) {
+        try {
+            return getUsersFormResponse(model, servletRequest);
+        } catch (Exception e) {
+            return helper.exceptionRedirectResolver(e, servletResponse, model);
+        }
+    }
+
+    @Override
+    public String getUser(GetUserRequest request, Model model, HttpServletRequest servletRequest, HttpServletResponse servletResponse) {
+        try {
+            return getUserResponse(request, model, servletRequest);
+        } catch (UIException e) {
+            return "redirect:../../auth/signIn";
+        } catch (Exception e) {
+            return helper.exceptionRedirectResolver(e, servletResponse, model);
+        }
+    }
+
+    @Override
+    public String changeUserRole(ChangeRoleRequest request, Model model, HttpServletRequest servletRequest, HttpServletResponse servletResponse) {
+        try {
+            return changeUserRoleResponse(request, model, servletRequest);
+        } catch (UIException e) {
+            return "redirect:../../auth/signIn";
+        } catch (Exception e) {
+            return helper.exceptionRedirectResolver(e, servletResponse, model);
+        }
+    }
+
+    private String getUsersFormResponse(Model model, HttpServletRequest servletRequest) {
+        model.addAttribute("role", helper.getCookiaValueByName(servletRequest, "role"));
+        return "users";
+    }
+
+    private String changeUserRoleResponse(ChangeRoleRequest request, Model model, HttpServletRequest servletRequest) throws UIException {
+        HttpEntity<ChangeRoleRequest> entity = new HttpEntity<>(request, helper.createAuthHeader(servletRequest));
+        ResponseEntity<ChangeRoleResponse> response = restTemplate.exchange(gatewayUrl + "/gateway-server/user/role/change", HttpMethod.POST, entity, ChangeRoleResponse.class);
+        if (response.getBody() == null || !response.getBody().isSuccess()) {
+            model.addAttribute("errorText", response.getBody().getErrorText());
+            return "error";
+        }
+        return "redirect:/admin/users";
+    }
+
+    private String getUserResponse(GetUserRequest request, Model model, HttpServletRequest servletRequest) throws UIException {
+        HttpEntity<GetUserRequest> entity = new HttpEntity<>(request, helper.createAuthHeader(servletRequest));
+        ResponseEntity<GetUserResponse> response = restTemplate.exchange(gatewayUrl + "/gateway-server/user/get", HttpMethod.POST, entity, GetUserResponse.class);
+        if (response.getBody() == null || !response.getBody().isSuccess()) {
+            model.addAttribute("errorText", response.getBody().getErrorText());
+            return "error";
+        }
+        model.addAttribute("role", helper.getCookiaValueByName(servletRequest, "role"));
+        model.addAttribute("user", response.getBody());
+        return "users";
+    }
+
     private String changeProductSatusResponse(String orderId, String status, Model model, HttpServletRequest servletRequest) throws UIException {
         ChangeOrderStatusRequest request = ChangeOrderStatusRequest.builder().orderId(Long.valueOf(orderId)).status(Status.valueOf(status)).build();
         HttpEntity<ChangeOrderStatusRequest> basketEntity = new HttpEntity<>(request, helper.createAuthHeader(servletRequest));

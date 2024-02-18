@@ -4,6 +4,7 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.lang.NonNull;
@@ -18,8 +19,10 @@ import ru.candle.store.authservice.service.JwtService;
 import ru.candle.store.authservice.service.UserService;
 
 import java.io.IOException;
+import java.util.Arrays;
 
 @Component
+@Slf4j
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     public static final String BEARER_PREFIX = "Bearer ";
@@ -35,9 +38,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             @NonNull HttpServletResponse response,
             @NonNull FilterChain filterChain) throws ServletException, IOException {
 
+        log.info(requestLog(request));
+
         //Получение токена из хэдера
         String authHeader = request.getHeader(HEADER_NAME);
         if (StringUtils.isEmpty(authHeader) || !StringUtils.startsWith(authHeader, BEARER_PREFIX)) {
+            log.warn("Токен авторизации отсутствует");
             filterChain.doFilter(request, response);
             return;
         }
@@ -69,5 +75,13 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         filterChain.doFilter(request, response);
 
+    }
+
+    private String requestLog(HttpServletRequest request) {
+        return "На вход поступил запрос \n" +
+                request.getMethod() + "\n" +
+                request.getRequestURI() + "\n" +
+                request.getHeaderNames() + "\n" +
+                Arrays.toString(request.getCookies()) + "\n";
     }
 }

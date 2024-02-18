@@ -9,6 +9,8 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import ru.candle.store.ui.dto.request.AddProductRequest;
 import ru.candle.store.ui.dto.request.AddPromocodeRequest;
+import ru.candle.store.ui.dto.request.ChangeRoleRequest;
+import ru.candle.store.ui.dto.request.GetUserRequest;
 import ru.candle.store.ui.service.IAdminService;
 
 @Controller
@@ -85,4 +87,20 @@ public class AdminController {
                                      Model model, HttpServletRequest servletRequest, HttpServletResponse servletResponse) {
         return service.changeProductSatus(orderId, status, model, servletRequest, servletResponse);
     }
+
+    @GetMapping("/users")
+    public String getUsersForm(Model model, HttpServletRequest servletRequest, HttpServletResponse servletResponse) {
+        return service.getUsersForm(model, servletRequest, servletResponse);
+    }
+
+    @PostMapping("/users/get")
+    public String getUser(@ModelAttribute GetUserRequest request, Model model, HttpServletRequest servletRequest, HttpServletResponse servletResponse) {
+        return service.getUser(request, model, servletRequest, servletResponse);
+    }
+
+    @PostMapping("/users/role/change")
+    public String changeUserRole(@ModelAttribute ChangeRoleRequest request, Model model, HttpServletRequest servletRequest, HttpServletResponse servletResponse) {
+        return service.changeUserRole(request, model, servletRequest, servletResponse);
+    }
+
 }

@@ -12,11 +12,11 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import ru.candle.store.authservice.config.JwtAuthenticationFilter;
 import ru.candle.store.authservice.controller.AuthenticationController;
-import ru.candle.store.authservice.dto.response.ChangePasswordResponse;
 import ru.candle.store.authservice.dto.response.GetTokenInfoResponse;
 import ru.candle.store.authservice.dto.response.JwtAuthenticationResponse;
 import ru.candle.store.authservice.dto.response.ValidateResponse;
 import ru.candle.store.authservice.service.AuthenticationService;
+import ru.candle.store.authservice.service.UserManagementService;
 
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -30,6 +30,9 @@ public class AuthenticationControllerTest {
 
     @MockBean
     private AuthenticationService authenticationService;
+
+    @MockBean
+    private UserManagementService userManagementService;
 
     @MockBean
     private JwtAuthenticationFilter filter;
@@ -104,20 +107,4 @@ public class AuthenticationControllerTest {
                 .andExpect(status().is4xxClientError());
     }
 
-    @Test
-    void whenChangePasswordSuccess() throws Exception {
-        String requset = "{\"username\": \"userlogin\", \"currentPassword\": \"password1\", \"newPassword\": \"password2\"}";
-        Mockito.when(authenticationService.changePassword(Mockito.any())).thenReturn(new ChangePasswordResponse(true));
-        mockMvc.perform(MockMvcRequestBuilders.post("/auth/password/change").content(requset).contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andExpect(content().json("{\"success\": true}"));
-    }
-
-    @Test
-    void whenChangePasswordFail() throws Exception {
-        String requset = "{\"username\": \"user\", \"currentPassword\": \"pass1\"}";
-        Mockito.when(authenticationService.getTokenInfo(Mockito.any())).thenThrow(RuntimeException.class);
-        mockMvc.perform(MockMvcRequestBuilders.post("/auth/password/change").content(requset).contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().is4xxClientError());
-    }
 }

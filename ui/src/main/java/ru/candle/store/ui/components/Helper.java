@@ -21,16 +21,16 @@ public class Helper {
         if (servletRequest.getCookies() == null) {
             throw new UIException(ExceptionCode.AUTHORIZATION_HEADER_EMPTY, "Необходимо авторизоваться");
         }
-        String token = Arrays.stream(servletRequest.getCookies()).filter(c -> c.getName().equals("AUTHORIZATION"))
+        String token = Arrays.stream(servletRequest.getCookies()).filter(c -> c.getName().equals("Authorization"))
                 .findFirst().orElseThrow(() -> new UIException(ExceptionCode.AUTHORIZATION_HEADER_EMPTY, "Необходимо авторизоваться")).getValue();
         HttpHeaders headers = new HttpHeaders();
-        headers.add("AUTHORIZATION", AUTH_PREFIX + token);
+        headers.add("Authorization", AUTH_PREFIX + token);
         return headers;
     }
 
     public String exceptionRedirectResolver(Exception e, HttpServletResponse servletResponse, Model model) {
         if (((HttpClientErrorException) e).getStatusCode().value() == 403) {
-            Cookie cookie = new Cookie("AUTHORIZATION", "");
+            Cookie cookie = new Cookie("Authorization", "");
             cookie.setDomain("localhost");
             cookie.setPath("/");
             Cookie roleCookie = new Cookie("role", "");

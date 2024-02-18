@@ -6,8 +6,10 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import ru.candle.store.authservice.dto.request.*;
-import ru.candle.store.authservice.dto.response.ChangePasswordResponse;
+import ru.candle.store.authservice.dto.request.GetTokenInfoRequest;
+import ru.candle.store.authservice.dto.request.SignInRequest;
+import ru.candle.store.authservice.dto.request.SignUpRequest;
+import ru.candle.store.authservice.dto.request.ValidateRequest;
 import ru.candle.store.authservice.dto.response.GetTokenInfoResponse;
 import ru.candle.store.authservice.dto.response.JwtAuthenticationResponse;
 import ru.candle.store.authservice.dto.response.ValidateResponse;
@@ -40,8 +42,4 @@ public class AuthenticationController {
         return authenticationService.getTokenInfo(rq);
     }
 
-    @PostMapping("/password/change")
-    public ChangePasswordResponse changePassword(@RequestBody @Valid ChangePasswordRequest rq) {
-        return authenticationService.changePassword(rq);
-    }
 }

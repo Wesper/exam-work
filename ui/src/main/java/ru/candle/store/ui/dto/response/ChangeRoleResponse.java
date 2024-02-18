@@ -1,4 +1,4 @@
-package ru.candle.store.authservice.dto.response;
+package ru.candle.store.ui.dto.response;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class ChangePasswordResponse {
+public class ChangeRoleResponse {
 
     private boolean success;
     private String errorCode;
