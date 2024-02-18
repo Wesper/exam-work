@@ -16,12 +16,19 @@
     <br>
 </div>
 
-<div class="row gy-3 overflow-hidden">
-    <h5 th:text="${'Дата заказа ' + #strings.substring(order.date,0,10) + ' ' + #strings.substring(order.date,11,19)}"></h5>
-    <h5 th:text="${'Цена ' + order.totalPrice + ' ₽'}"></h5>
-    <h5 th:if="${order.promocode != null}"><span th:text="${'Цена со скидкой ' + order.totalPromoPrice + ' ₽'}"></span></h5>
-    <h5 th:if="${order.promocode != null}"><span th:text="${'Промокод ' + order.promocode}"></span></h5>
-    <h5 th:text="${'Статус заказа ' + order.status}"></h5>
+<div class="row gy-3 overflow-hidden" >
+    <h5 th:text="${'Дата заказа: ' + #strings.substring(order.date,0,10) + ' ' + #strings.substring(order.date,11,19)}"></h5>
+    <h5 th:text="${'Цена: ' + order.totalPrice + ' ₽'}"></h5>
+    <h5 th:if="${order.promocode != null}"><span th:text="${'Цена со скидкой: ' + order.totalPromoPrice + ' ₽'}"></span></h5>
+    <h5 th:if="${order.promocode != null}"><span th:text="${'Промокод: ' + order.promocode}"></span></h5>
+<!--    <h5 th:text="${'Статус заказа ' + order.status}"></h5>-->
+    <h5 th:switch="${order.status.name}">
+        <span>Статус заказа: </span>
+        <span class="fw-normal mb-1" th:case="NEW">Новый</span>
+        <span class="fw-normal mb-1" th:case="IN_PROGRESS">В обработке</span>
+        <span class="fw-normal mb-1" th:case="FINISHED">Завершен</span>
+        <span class="fw-normal mb-1" th:case="CANCELLED">Отменен</span>
+    </h5>
 </div>
 
 <div class="row gy-3 overflow-hidden">
