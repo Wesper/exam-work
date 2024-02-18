@@ -1,7 +1,6 @@
 package ru.candle.store.authservice.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
@@ -45,7 +44,7 @@ public class UserService {
      *
      * @return пользователь
      */
-    private UserEntity getByUsername(String username) {
+    public UserEntity getByUsername(String username) {
         return repository.findByUsername(username)
                 .orElseThrow(() -> new UsernameNotFoundException("Пользователь не найден"));
     }
@@ -60,16 +59,6 @@ public class UserService {
     }
 
     /**
-     * Получение текущего пользователя из контекста Spring Security
-     *
-     * @return текущий пользователь
-     */
-    public UserEntity getCurrentUser() {
-        var username = SecurityContextHolder.getContext().getAuthentication().getName();
-        return getByUsername(username);
-    }
-
-    /**
      * Изменение пароля пользователя
      *
      * @return сохраненный пользователь
@@ -79,6 +68,20 @@ public class UserService {
         int updateRows = repository.updatePasswordByUsername(password, username);
         if (updateRows != 1) {
             throw new RuntimeException("Ошибка при обновлении пароля пользователя");
+        }
+        return true;
+    }
+
+    /**
+     * Изменение пароля пользователя
+     *
+     * @return сохраненный пользователь
+     */
+    @Transactional
+    public boolean changeRole(String userName, String newRole) {
+        int updateRows = repository.updateRoleByUsername(userName, newRole);
+        if (updateRows != 1) {
+            throw new RuntimeException("Ошибка при обновлении роли пользователя");
         }
         return true;
     }

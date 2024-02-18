@@ -9,9 +9,14 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class ChangePasswordResponse {
+public class GetUserResponse {
 
     private boolean success;
+    private String userId;
+    private String userName;
+    private String email;
+    private String role;
     private String errorCode;
     private String errorText;
+
 }

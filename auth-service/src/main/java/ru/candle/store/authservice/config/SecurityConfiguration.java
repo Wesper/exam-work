@@ -1,5 +1,6 @@
 package ru.candle.store.authservice.config;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -19,6 +20,7 @@ import ru.candle.store.authservice.service.UserService;
 
 @Configuration
 @EnableWebSecurity
+@Slf4j
 public class SecurityConfiguration {
 
     @Autowired
@@ -32,7 +34,9 @@ public class SecurityConfiguration {
                 .csrf(AbstractHttpConfigurer::disable)
                 .cors(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(rq -> rq
-                        .requestMatchers("/auth/**").permitAll())
+                        .requestMatchers("/auth/**").permitAll()
+                        .requestMatchers("/user/get").permitAll()
+                        .requestMatchers("/user/password/change", "/user/role/change").authenticated())
                 .headers(AbstractHttpConfigurer::disable)
                 .sessionManagement(manager -> manager.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authenticationProvider(authenticationProvider())

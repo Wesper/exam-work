@@ -43,7 +43,7 @@ public class AuthServiceImpl implements IAuthService {
                 .build();
         try {
             SignInUpResponse response = restTemplate.postForObject(gatewayUrl + "/auth/signUp", request, SignInUpResponse.class);
-            Cookie authCookie = new Cookie("AUTHORIZATION", response.getToken());
+            Cookie authCookie = new Cookie("Authorization", response.getToken());
             authCookie.setDomain("localhost");
             authCookie.setPath("/");
             servletResponse.addCookie(authCookie);
@@ -65,7 +65,7 @@ public class AuthServiceImpl implements IAuthService {
                 .build();
         try {
             SignInUpResponse response = restTemplate.postForObject(gatewayUrl + "/auth/signIn", request, SignInUpResponse.class);
-            Cookie authCookie = new Cookie("AUTHORIZATION", response.getToken());
+            Cookie authCookie = new Cookie("Authorization", response.getToken());
             authCookie.setDomain("localhost");
             authCookie.setPath("/");
             servletResponse.addCookie(authCookie);
@@ -81,7 +81,7 @@ public class AuthServiceImpl implements IAuthService {
 
     @Override
     public String logout(HttpServletResponse servletResponse) {
-        Cookie cookie = new Cookie("AUTHORIZATION", "");
+        Cookie cookie = new Cookie("Authorization", "");
         cookie.setDomain("localhost");
         cookie.setPath("/");
         servletResponse.addCookie(cookie);

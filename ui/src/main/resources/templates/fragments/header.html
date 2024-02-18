@@ -23,6 +23,7 @@
                         <li th:if="${role.equals('ADMIN')}"><a class="dropdown-item" th:href="@{/admin/images/list}">Управление статикой</a></li>
                         <li th:if="${role.equals('ADMIN')}"><a class="dropdown-item" th:href="@{/admin/products/list}">Управление продуктами</a></li>
                         <li th:if="${role.equals('ADMIN')}"><a class="dropdown-item" th:href="@{/admin/promocodes/list}">Управление промокодами</a></li>
+                        <li th:if="${role.equals('ADMIN')}"><a class="dropdown-item" th:href="@{/admin/users}">Управление пользователями</a></li>
                     </ul>
                 </li>
                 <li class="nav-item" th:if="${role.equals('USER')}">
