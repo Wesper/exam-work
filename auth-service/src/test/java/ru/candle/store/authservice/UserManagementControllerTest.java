@@ -37,7 +37,7 @@ public class UserManagementControllerTest {
     @Test
     void whenChangePasswordSuccess() throws Exception {
         String requset = "{\"username\": \"userlogin\", \"currentPassword\": \"password1\", \"newPassword\": \"password2\"}";
-        Mockito.when(userManagementService.changePassword(Mockito.any())).thenReturn(new ChangePasswordResponse(true));
+        Mockito.when(userManagementService.changePassword(Mockito.any())).thenReturn(new ChangePasswordResponse(true, null, null));
         mockMvc.perform(MockMvcRequestBuilders.post("/user/password/change").content(requset).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().json("{\"success\": true}"));
