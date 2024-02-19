@@ -129,7 +129,7 @@
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
                 <configuration>
-                    <mainClass>ru/candle/store/authservice/AuthServiceApplication</mainClass>
+                    <mainClass>ru.candle.store.authservice.AuthServiceApplication</mainClass>
                 </configuration>
             </plugin>
         </plugins>
