@@ -12,8 +12,10 @@ import ru.candle.store.orderservice.dto.Order;
 import ru.candle.store.orderservice.dto.request.order.*;
 import ru.candle.store.orderservice.dto.response.ProductInfo;
 import ru.candle.store.orderservice.dto.response.integration.GetProductsInfoResponse;
+import ru.candle.store.orderservice.dto.response.integration.GetUserAuthResponse;
 import ru.candle.store.orderservice.dto.response.integration.GetUserInfoResponse;
 import ru.candle.store.orderservice.dto.response.order.*;
+import ru.candle.store.orderservice.entity.EmailDetails;
 import ru.candle.store.orderservice.entity.OrderEntity;
 import ru.candle.store.orderservice.entity.ProductEntity;
 import ru.candle.store.orderservice.entity.PromocodeEntity;
@@ -21,6 +23,7 @@ import ru.candle.store.orderservice.exception.OrderException;
 import ru.candle.store.orderservice.repository.BasketRepository;
 import ru.candle.store.orderservice.repository.OrderRepository;
 import ru.candle.store.orderservice.repository.PromocodeRepository;
+import ru.candle.store.orderservice.service.IEmailService;
 import ru.candle.store.orderservice.service.IIntegrationService;
 import ru.candle.store.orderservice.service.IOrderService;
 
@@ -46,6 +49,9 @@ public class OrderServiceImpl implements IOrderService {
 
     @Autowired
     private IIntegrationService integrationService;
+
+    @Autowired
+    private IEmailService emailService;
 
     @Autowired
     private ObjectMapper objectMapper;
@@ -93,9 +99,9 @@ public class OrderServiceImpl implements IOrderService {
     }
 
     @Override
-    public ChangeOrderStatusResponse changeOrderStatus(ChangeOrderStatusRequest rq) {
+    public ChangeOrderStatusResponse changeOrderStatus(ChangeOrderStatusRequest rq, String role) {
         try {
-            return changeOrderStatusResponse(rq);
+            return changeOrderStatusResponse(rq, role);
         } catch (OrderException e) {
             log.error(e.getMessage(), e);
             return ChangeOrderStatusResponse.builder()
@@ -267,13 +273,16 @@ public class OrderServiceImpl implements IOrderService {
                 .build();
     }
 
-    private ChangeOrderStatusResponse changeOrderStatusResponse(ChangeOrderStatusRequest rq) throws OrderException {
+    private ChangeOrderStatusResponse changeOrderStatusResponse(ChangeOrderStatusRequest rq, String role) throws OrderException {
         Optional<OrderEntity> orderEntity = orderRepository.findById(rq.getOrderId());
         if (orderEntity.isEmpty()) {
             throw new OrderException(ExceptionCode.ORDER_NOT_FOUND, "Заказ не найден");
         }
         orderEntity.get().setStatus(rq.getStatus());
         orderRepository.save(orderEntity.get());
+        GetUserAuthResponse userAuth = integrationService.getUserAuth(orderEntity.get().getUserId(), role);
+        emailService.sendEmail(new EmailDetails(userAuth.getEmail(), "Статус заказа " + rq.getOrderId() + " изменен на: " + rq.getStatus(),
+                "Изменен статус заказа " + rq.getOrderId(), null));
         return ChangeOrderStatusResponse.builder().success(true).build();
     }
 

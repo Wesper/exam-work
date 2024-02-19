@@ -36,7 +36,10 @@ public class SecurityConfiguration {
                 .authorizeHttpRequests(rq -> rq
                         .requestMatchers("/auth/**").permitAll()
                         .requestMatchers("/user/get").permitAll()
-                        .requestMatchers("/user/password/change", "/user/role/change").authenticated())
+                        .requestMatchers("/user/password/change").permitAll()
+                        .requestMatchers("/user/id/get").permitAll()
+                        .requestMatchers("/user/role/change").permitAll())
+//                        .requestMatchers("/user/id/get", "/user/role/change").authenticated())
                 .headers(AbstractHttpConfigurer::disable)
                 .sessionManagement(manager -> manager.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authenticationProvider(authenticationProvider())

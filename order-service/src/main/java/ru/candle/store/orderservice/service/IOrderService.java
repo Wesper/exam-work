@@ -28,7 +28,7 @@ public interface IOrderService {
      * @param rq запрос
      * @return true или false
      */
-    ChangeOrderStatusResponse changeOrderStatus(ChangeOrderStatusRequest rq);
+    ChangeOrderStatusResponse changeOrderStatus(ChangeOrderStatusRequest rq, String role);
 
     /**
      * Получение списка заказов со статусом

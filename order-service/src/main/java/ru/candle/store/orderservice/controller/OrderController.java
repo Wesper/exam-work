@@ -63,7 +63,7 @@ public class OrderController {
     @PreAuthorize("#role == 'MANAGER' || #role == 'ADMIN'")
     @PostMapping(value = "/status/change")
     public ChangeOrderStatusResponse changeOrderStatus(@RequestBody @Valid ChangeOrderStatusRequest rq, @RequestHeader("role") String role) {
-        return service.changeOrderStatus(rq);
+        return service.changeOrderStatus(rq, role);
     }
 
     /**

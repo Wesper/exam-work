@@ -9,6 +9,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import ru.candle.store.authservice.dto.request.ChangePasswordRequest;
 import ru.candle.store.authservice.dto.request.ChangeRoleRequest;
+import ru.candle.store.authservice.dto.request.GetUserByIdRequest;
 import ru.candle.store.authservice.dto.request.GetUserRequest;
 import ru.candle.store.authservice.dto.response.ChangePasswordResponse;
 import ru.candle.store.authservice.dto.response.ChangeRoleResponse;
@@ -86,6 +87,37 @@ public class UserManagementService {
     public GetUserResponse getUser(GetUserRequest request) {
         try {
             UserEntity user = userService.getByUsername(request.getUserName());
+            return GetUserResponse.builder()
+                    .success(true)
+                    .userId(String.valueOf(user.getId()))
+                    .userName(user.getUsername())
+                    .email(user.getEmail())
+                    .role(String.valueOf(user.getRole()))
+                    .build();
+        } catch (UsernameNotFoundException e) {
+            return GetUserResponse.builder()
+                    .success(false)
+                    .errorCode("USER_NOT_FOUND")
+                    .errorText("Пользователь не найден")
+                    .build();
+        } catch (Exception e) {
+            return GetUserResponse.builder()
+                    .success(false)
+                    .errorCode("UNKNOWN_EXCEPTION")
+                    .errorText("Произошла непредвиденная ошибка")
+                    .build();
+        }
+    }
+
+    /**
+     * Плучение информации о пользователе
+     *
+     * @param request имя пользователя
+     * @return информация о пользователе
+     */
+    public GetUserResponse getUserById(GetUserByIdRequest request) {
+        try {
+            UserEntity user = userService.getByUserId(request.getUserId());
             return GetUserResponse.builder()
                     .success(true)
                     .userId(String.valueOf(user.getId()))

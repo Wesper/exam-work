@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import ru.candle.store.authservice.dictionary.Role;
 import ru.candle.store.authservice.dto.request.*;
 import ru.candle.store.authservice.dto.response.*;
+import ru.candle.store.authservice.entity.EmailDetails;
 import ru.candle.store.authservice.entity.UserEntity;
 
 @Service
@@ -22,6 +23,8 @@ public class AuthenticationService {
     private PasswordEncoder passwordEncoder;
     @Autowired
     private AuthenticationManager authenticationManager;
+    @Autowired
+    private EmailService emailService;
 
     /**
      * Регистрация пользователя
@@ -40,6 +43,11 @@ public class AuthenticationService {
         user = userService.create(user);
 
         String jwt = jwtService.generateToken(user);
+        EmailDetails email = new EmailDetails();
+                email.setRecipient(user.getEmail());
+                email.setMsgBody("Поздравляем с успешной регистрацией " + user.getUsername());
+                email.setSubject("Поздравляем с регистрацией");
+        emailService.sendEmail(email);
         return new JwtAuthenticationResponse(jwt);
     }
 

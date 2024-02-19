@@ -50,6 +50,16 @@ public class UserService {
     }
 
     /**
+     * Получение пользователя по id пользователя
+     *
+     * @return пользователь
+     */
+    public UserEntity getByUserId(String userId) {
+        return repository.findById(Long.valueOf(userId))
+                .orElseThrow(() -> new UsernameNotFoundException("Пользователь не найден"));
+    }
+
+    /**
      * Получение пользователя по имени пользователя
      *
      * @return пользователь
