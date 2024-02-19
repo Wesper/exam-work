@@ -77,7 +77,7 @@
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
                 <configuration>
-                    <mainClass>ru/candle/store/emailservice/EmailServiceApplication</mainClass>
+                    <mainClass>ru.candle.store.emailservice.EmailServiceApplication</mainClass>
                 </configuration>
             </plugin>
         </plugins>

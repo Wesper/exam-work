@@ -100,7 +100,7 @@
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
                 <configuration>
-                    <mainClass>ru/candle/store/orderservice/OrderServiceApplication</mainClass>
+                    <mainClass>ru.candle.store.orderservice.OrderServiceApplication</mainClass>
                 </configuration>
             </plugin>
         </plugins>

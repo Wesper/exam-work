@@ -32,7 +32,7 @@ public class StaticServiceImpl implements IStaticService {
     @Value("${minio.bucket.name}")
     private String bucketName;
 
-    @Value("${minio.url}")
+    @Value("${minio.data.url}")
     private String minioUrl;
 
     @Override
