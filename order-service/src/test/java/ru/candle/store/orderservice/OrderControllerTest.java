@@ -160,7 +160,7 @@ OrderControllerTest {
     void whenChangeOrderStatusSuccess() throws Exception {
         ChangeOrderStatusRequest rq = new ChangeOrderStatusRequest(1L, Status.IN_PROGRESS);
         ChangeOrderStatusResponse rs = ChangeOrderStatusResponse.builder().success(true).build();
-        Mockito.when(service.changeOrderStatus(rq)).thenReturn(rs);
+        Mockito.when(service.changeOrderStatus(rq, "MANAGER")).thenReturn(rs);
 
         mockMvc.perform(MockMvcRequestBuilders.post("/order/status/change").header("role", "MANAGER")
                         .content(objectMapper.writeValueAsString(rq)).contentType(MediaType.APPLICATION_JSON))
@@ -176,7 +176,7 @@ OrderControllerTest {
                 .errorCode(ExceptionCode.ORDER_NOT_FOUND.getErrorCode())
                 .errorText(ExceptionCode.ORDER_NOT_FOUND.getErrorText())
                 .build();
-        Mockito.when(service.changeOrderStatus(rq)).thenReturn(rs);
+        Mockito.when(service.changeOrderStatus(rq, "MANAGER")).thenReturn(rs);
 
         mockMvc.perform(MockMvcRequestBuilders.post("/order/status/change").header("role", "MANAGER")
                         .content(objectMapper.writeValueAsString(rq)).contentType(MediaType.APPLICATION_JSON))

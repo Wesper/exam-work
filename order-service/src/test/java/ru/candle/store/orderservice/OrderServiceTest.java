@@ -19,6 +19,7 @@ import ru.candle.store.orderservice.dto.request.order.GetAllOrdersByStatusReques
 import ru.candle.store.orderservice.dto.request.order.GetOrderRequest;
 import ru.candle.store.orderservice.dto.response.ProductInfo;
 import ru.candle.store.orderservice.dto.response.integration.GetProductsInfoResponse;
+import ru.candle.store.orderservice.dto.response.integration.GetUserAuthResponse;
 import ru.candle.store.orderservice.dto.response.integration.GetUserInfoResponse;
 import ru.candle.store.orderservice.dto.response.order.*;
 import ru.candle.store.orderservice.entity.OrderEntity;
@@ -28,6 +29,7 @@ import ru.candle.store.orderservice.exception.OrderException;
 import ru.candle.store.orderservice.repository.BasketRepository;
 import ru.candle.store.orderservice.repository.OrderRepository;
 import ru.candle.store.orderservice.repository.PromocodeRepository;
+import ru.candle.store.orderservice.service.IEmailService;
 import ru.candle.store.orderservice.service.impl.IntegrationServiceImpl;
 import ru.candle.store.orderservice.service.impl.OrderServiceImpl;
 
@@ -52,6 +54,9 @@ public class OrderServiceTest {
 
     @Mock
     private IntegrationServiceImpl integrationService;
+
+    @Mock
+    private IEmailService emailService;
 
     @InjectMocks
     private OrderServiceImpl orderService;
@@ -310,7 +315,7 @@ public class OrderServiceTest {
     }
 
     @Test
-    void whenChangeOrderStatusSuccess() throws JsonProcessingException {
+    void whenChangeOrderStatusSuccess() throws JsonProcessingException, OrderException {
         List<ProductEntity> products = List.of(
                 new ProductEntity(1L, "image", "title", 10L, null, 1L),
                 new ProductEntity(2L, "image2", "title2", 20L, null, 2L)
@@ -321,8 +326,16 @@ public class OrderServiceTest {
         Mockito.when(orderRepository.findById(1L)).thenReturn(Optional.of(orderEntity));
         orderEntity.setStatus(Status.IN_PROGRESS);
         Mockito.when(orderRepository.save(orderEntity)).thenReturn(orderEntity);
+        GetUserAuthResponse authResponse = GetUserAuthResponse.builder()
+                .success(true)
+                .email("email")
+                .errorText("text")
+                .userName("name")
+                .userId("1")
+                .build();
+        Mockito.when(integrationService.getUserAuth(Mockito.any(), Mockito.any())).thenReturn(authResponse);
 
-        ChangeOrderStatusResponse rs = orderService.changeOrderStatus(new ChangeOrderStatusRequest(1L, Status.IN_PROGRESS));
+        ChangeOrderStatusResponse rs = orderService.changeOrderStatus(new ChangeOrderStatusRequest(1L, Status.IN_PROGRESS), "MANAGER");
         Assertions.assertEquals(ChangeOrderStatusResponse.builder().success(true).build(), rs);
     }
 
@@ -330,7 +343,7 @@ public class OrderServiceTest {
     void whenChangeOrderStatusNotFoundFail() {
         Mockito.when(orderRepository.findById(1L)).thenReturn(Optional.ofNullable(null));
 
-        ChangeOrderStatusResponse rs = orderService.changeOrderStatus(new ChangeOrderStatusRequest(1L, Status.IN_PROGRESS));
+        ChangeOrderStatusResponse rs = orderService.changeOrderStatus(new ChangeOrderStatusRequest(1L, Status.IN_PROGRESS), "MANAGER");
         Assertions.assertAll(
                 () -> Assertions.assertFalse(rs.getSuccess()),
                 () -> Assertions.assertEquals(ExceptionCode.ORDER_NOT_FOUND.getErrorCode(), rs.getErrorCode()),
