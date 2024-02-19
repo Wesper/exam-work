@@ -10,7 +10,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import ru.candle.store.orderservice.dictionary.ExceptionCode;
 import ru.candle.store.orderservice.dto.request.integration.GetProductsInfoRequest;
+import ru.candle.store.orderservice.dto.request.integration.GetUserAuthRequest;
 import ru.candle.store.orderservice.dto.response.integration.GetProductsInfoResponse;
+import ru.candle.store.orderservice.dto.response.integration.GetUserAuthResponse;
 import ru.candle.store.orderservice.dto.response.integration.GetUserInfoResponse;
 import ru.candle.store.orderservice.exception.OrderException;
 import ru.candle.store.orderservice.service.IIntegrationService;
@@ -48,6 +50,22 @@ public class IntegrationServiceImpl implements IIntegrationService {
         HttpEntity<Void> entity = new HttpEntity<>(headers);
         ResponseEntity<GetUserInfoResponse> response = restTemplate.exchange("http://profile-service/profile/get", HttpMethod.GET, entity, GetUserInfoResponse.class);
         if (response.getBody() != null && response.getBody().getSuccess()) {
+            log.info(response.getBody().toString());
+            return response.getBody();
+        } else {
+            log.error(response.getBody().toString());
+            throw new OrderException(ExceptionCode.GET_USER_PROFILE_IS_NULL, "Произошла ошибка при получении профиля клиента");
+        }
+    }
+
+    @Override
+    public GetUserAuthResponse getUserAuth(Long userId, String role) throws OrderException {
+        GetUserAuthRequest request = new GetUserAuthRequest(String.valueOf(userId));
+        HttpHeaders headers = new HttpHeaders();
+        headers.set("role", role);
+        HttpEntity<GetUserAuthRequest> entity = new HttpEntity<>(request, headers);
+        ResponseEntity<GetUserAuthResponse> response = restTemplate.exchange("http://auth-service/user/id/get", HttpMethod.POST, entity, GetUserAuthResponse.class);
+        if (response.getBody() != null && response.getBody().isSuccess()) {
             log.info(response.getBody().toString());
             return response.getBody();
         } else {

@@ -1,6 +1,7 @@
 package ru.candle.store.orderservice.service;
 
 import ru.candle.store.orderservice.dto.response.integration.GetProductsInfoResponse;
+import ru.candle.store.orderservice.dto.response.integration.GetUserAuthResponse;
 import ru.candle.store.orderservice.dto.response.integration.GetUserInfoResponse;
 import ru.candle.store.orderservice.exception.OrderException;
 
@@ -25,4 +26,13 @@ public interface IIntegrationService {
      * @throws OrderException
      */
     GetUserInfoResponse getUserInfo(Long userId, String role) throws OrderException;
+
+    /**
+     * Получение информации об авторизации пользователя
+     * @param userId идентификатор пользователя
+     * @param role роль пользователя
+     * @return информаци о пользователе
+     * @throws OrderException
+     */
+    GetUserAuthResponse getUserAuth(Long userId, String role) throws OrderException;
 }
